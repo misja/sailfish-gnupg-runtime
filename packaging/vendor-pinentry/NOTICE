@@ -1,0 +1,16 @@
+Native pinentry compatibility candidate — distribution notice
+
+Sailfish Secrets source is licensed under BSD-3-Clause; preserve the copyright
+holders and conditions in sailfish-secrets-LICENSE. The pinentry executable
+statically incorporates libassuan 1.0.5, licensed under LGPL-2.1-or-later.
+See libassuan-COPYING.LIB for that license and warranty disclaimer.
+
+The supplied helper objects and RELINK.md are intended to allow modification
+of Assuan and relinking for personal use. No additional restriction on that
+modification or reverse engineering for debugging such modifications is imposed
+by this packaging. This notice does not change the upstream component licenses.
+
+A complete distribution must also supply the matching Assuan source RPM
+libassuan-1.0.5-1.6.2.jolla.src.rpm, all vendor patches and build instructions,
+and the Sailfish Secrets source RPM with its pinned release and framework dependencies.
+The current local preparation is not a complete or independently approved release.

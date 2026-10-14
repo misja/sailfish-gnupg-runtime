@@ -1,0 +1,10 @@
+{
+  "upstream_commit": "5a8d33e2eda2fe10a64acc42912dd3bedc736495",
+  "files": {
+    "pinentry.cpp": "c5db530b4edb4f2b21519be4fe6b29767603c1c75203dd5dcb0c12ed21c13136",
+    "qassuanserver.h": "0a0cf9319f32d91bf4b164b3f59acc8d4918d88f0f84a83e02762a1a696cd232",
+    "LICENSE": "3a9b5b0d46996cdfd82b65429e189904e4ab1908014ce408cbecde9f591f37b4",
+    "qassuanserver.cpp": "d6b39a27bb4c3ee4a8b23c4163f620c698e7326f3c96b888f6f67f7e0e763be1"
+  },
+  "scope": "UI-only synthetic prototype; no persistent-cache operations; unchanged GnuPG"
+}

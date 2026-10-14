@@ -1,0 +1,78 @@
+--- a/sailfish-secrets.spec
++++ b/sailfish-secrets.spec
+@@ -1,12 +1,24 @@
+ %global secretsdaemon sailfishsecretsdaemon
++# Downstream plugin candidate: source rebuild preserves the reviewed target pins.
++%global vendor_framework_release 1.14.3.jolla
+ 
+ Name:       sailfish-secrets
+ Summary:    Sailfish OS framework for secrets storage and cryptographic operations
+ Version:    0.2.44
+-Release:    1.14.2.jolla
++Release:    1.14.3.jolla.compat3
+ License:    BSD
+ URL:        https://github.com/sailfishos/sailfish-secrets
+ Source0:    %{name}-%{version}.tar.bz2
++Source10:   sailfish-secrets-LICENSE
++Source11:   libassuan-COPYING.LIB
++Source12:   NOTICE
++Source13:   RELINK.md
++Source14:   REBUILD.md
++Patch1:     0001-option-error-codes.patch
++Patch2:     0002-assuan-api-compatibility.patch
++Patch3:     0003-cache-hit-provenance.patch
++Patch4:     0004-external-cache-permission.patch
++Patch5:     0005-keyinfo-precedence.patch
+ BuildRequires:  pkgconfig(Qt5Core)
+ BuildRequires:  pkgconfig(Qt5Sql)
+ BuildRequires:  pkgconfig(Qt5DBus)
+@@ -218,10 +230,11 @@
+ %{summary}.
+ 
+ %package -n %{secretsdaemon}-cryptoplugins-gnupg
++License:    BSD-3-Clause AND LGPL-2.1-or-later
+ Summary:    Sailfish OS crypto daemon plugins for GnuPG
+-Requires:   %{secretsdaemon} = %{version}-%{release}
+-Requires:   libsailfishcrypto = %{version}-%{release}
+-Requires:   libsailfishcryptopluginapi = %{version}-%{release}
++Requires:   %{secretsdaemon} = %{version}-%{vendor_framework_release}
++Requires:   libsailfishcrypto = %{version}-%{vendor_framework_release}
++Requires:   libsailfishcryptopluginapi = %{version}-%{vendor_framework_release}
+ Requires:   %{secretsdaemon}-secretsplugin-common
+ 
+ %description -n %{secretsdaemon}-cryptoplugins-gnupg
+@@ -246,6 +259,7 @@
+ 
+ %prep
+ %setup -q -n %{name}-%{version}
++%autopatch -p1
+ 
+ %build
+ %qmake5 "VERSION=%{version}"
+@@ -254,6 +268,17 @@
+ %install
+ rm -rf %{buildroot}
+ %qmake5_install
++
++# Keep LGPL relink materials with the selected plugin, without new executables.
++install -D -m 0644 %{SOURCE10} %{buildroot}%{_datadir}/licenses/%{secretsdaemon}-cryptoplugins-gnupg/sailfish-secrets-LICENSE
++install -D -m 0644 %{SOURCE11} %{buildroot}%{_datadir}/licenses/%{secretsdaemon}-cryptoplugins-gnupg/libassuan-COPYING.LIB
++install -D -m 0644 %{SOURCE12} %{buildroot}%{_docdir}/%{secretsdaemon}-cryptoplugins-gnupg/NOTICE
++install -D -m 0644 %{SOURCE13} %{buildroot}%{_docdir}/%{secretsdaemon}-cryptoplugins-gnupg/RELINK.md
++install -D -m 0644 %{SOURCE14} %{buildroot}%{_docdir}/%{secretsdaemon}-cryptoplugins-gnupg/REBUILD.md
++mkdir -p %{buildroot}%{_docdir}/%{secretsdaemon}-cryptoplugins-gnupg/relink
++for object in pinentry.o qassuanserver.o moc_qassuanserver.o; do
++    install -m 0644 plugins/gnupgplugin/pinentry/$object %{buildroot}%{_docdir}/%{secretsdaemon}-cryptoplugins-gnupg/relink/$object
++done
+ 
+ mkdir -p %{buildroot}/%{_docdir}/Sailfish/Secrets/
+ mkdir -p %{buildroot}/%{_docdir}/Sailfish/Crypto/
+@@ -432,6 +457,8 @@
+ %{_libdir}/Sailfish/Crypto/libsailfishcrypto-openssl.so
+ 
+ %files -n %{secretsdaemon}-cryptoplugins-gnupg
++%license %{_datadir}/licenses/%{secretsdaemon}-cryptoplugins-gnupg/
++%doc %{_docdir}/%{secretsdaemon}-cryptoplugins-gnupg/
+ %{_libdir}/Sailfish/Crypto/libsailfishcrypto-openpgp.so
+ %{_libdir}/Sailfish/Crypto/libsailfishcrypto-smime.so
+ %{_bindir}/pinentry
