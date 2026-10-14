@@ -1,17 +1,9 @@
-From 9f5c55064f128730c12c19234de06d7783992b30 Mon Sep 17 00:00:00 2001
-From: misja <redacted@example.invalid>
-Date: Tue, 13 Oct 2026 09:48:47 +0200
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Misja Hoebe <36168+misja@users.noreply.github.com>
+Date: Wed, 14 Oct 2026 20:52:29 +0200
 Subject: [PATCH] pinentry: support legacy and modern Assuan server APIs
 
 Keep the legacy init/deinit and callback signatures while adapting versioned modern headers to new/release and modern registration. Emit source-qualified errors supported by both APIs. Only mark the server connected after complete registration, release failed contexts once, and return an error instead of entering the event loop after failed startup. Storage and interaction methods are retained.
----
- plugins/gnupgplugin/pinentry/assuancompat.h   |  58 ++++++++
- plugins/gnupgplugin/pinentry/pinentry.cpp     |   2 +-
- plugins/gnupgplugin/pinentry/pinentry.pro     |   2 +-
- .../gnupgplugin/pinentry/qassuanserver.cpp    | 129 ++++++++++--------
- plugins/gnupgplugin/pinentry/qassuanserver.h  |  31 +++--
- 5 files changed, 148 insertions(+), 74 deletions(-)
- create mode 100644 plugins/gnupgplugin/pinentry/assuancompat.h
 
 diff --git a/plugins/gnupgplugin/pinentry/assuancompat.h b/plugins/gnupgplugin/pinentry/assuancompat.h
 new file mode 100644
@@ -509,6 +501,3 @@ index cd1091f..206fe59 100644
  
      Sailfish::Secrets::SecretManager secretManager;
      Sailfish::Secrets::Secret::Identifier cacheId;
--- 
-2.55.0
-

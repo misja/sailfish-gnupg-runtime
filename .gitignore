@@ -18,3 +18,9 @@ private-keys-v1.d/
 secring.gpg
 trustdb.gpg
 S.gpg-agent*
+
+# Generated from pinned upstream-fork commits
+/integrations/native-pinentry/upstream/*.cpp
+/integrations/native-pinentry/upstream/*.h
+/integrations/native-pinentry/prepared/
+/integrations/native-pinentry/compat/

@@ -1,13 +1,9 @@
-From 0b194515619f5bcccbeae9bea15946fc0cd29f27 Mon Sep 17 00:00:00 2001
-From: misja <redacted@example.invalid>
-Date: Tue, 13 Oct 2026 10:38:12 +0200
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Misja Hoebe <36168+misja@users.noreply.github.com>
+Date: Wed, 14 Oct 2026 20:52:29 +0200
 Subject: [PATCH] pinentry: require agent permission for external cache access
 
 Default to no external cache access. Honor allow-external-password-cache and retain permission over RESET, as standard pinentry does. Gate both lookup and storage on permission plus the existing user setting. Legacy agents without this option retain native interaction but no longer use external persistent caching.
----
- plugins/gnupgplugin/pinentry/qassuanserver.cpp | 6 ++++--
- plugins/gnupgplugin/pinentry/qassuanserver.h   | 1 +
- 2 files changed, 5 insertions(+), 2 deletions(-)
 
 diff --git a/plugins/gnupgplugin/pinentry/qassuanserver.cpp b/plugins/gnupgplugin/pinentry/qassuanserver.cpp
 index 21da163..e8abe1d 100644
@@ -52,6 +48,3 @@ index cc1cb1e..1946167 100644
  
      QString m_ctype;
      QString m_messages;
--- 
-2.55.0
-

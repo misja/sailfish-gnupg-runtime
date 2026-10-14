@@ -2,7 +2,7 @@
 
 Decision accepted 2026-10-14: GPL-3.0-or-later for original work; copyright (c) 2026 Misja Hoebe (@misja). See LICENSING.md and LICENSE.
 
-Original runtime wrappers, orchestration and documentation: GPL-3.0-or-later, accepted 2026-10-14; copyright (c) 2026 Misja Hoebe. Sailfish Secrets upstream pinentry source, derived/prepared source, compatibility patches and vendor-derived packaging retain BSD-3-Clause; preserve upstream copyright headers and the included upstream and vendor license texts. Legacy statically linked Assuan retains LGPL-2.1-or-later notices. GnuPG/runtime dependencies are external pinned inputs with their own GPL/LGPL licenses; the RPM License field does not license this repository's original code. No binaries, upstream archive or relink bundle is included.
+Original runtime wrappers, orchestration and documentation: GPL-3.0-or-later, accepted 2026-10-14; copyright (c) 2026 Misja Hoebe. Sailfish Secrets forked pinentry source, materialized prototype source, compatibility patches and vendor-derived packaging retain BSD-3-Clause; preserve upstream copyright headers and the included upstream and vendor license texts. Legacy statically linked Assuan retains LGPL-2.1-or-later notices. GnuPG/runtime dependencies are external pinned inputs with their own GPL/LGPL licenses; the RPM License field does not license this repository's original code. No binaries, upstream archive or relink bundle is included.
 
 A root original-work license must explicitly preserve these per-file exceptions. Preserve upstream license terms for patches and code. Preserve existing upstream notices and authors; no source/binary distribution clearance is inferred from repository visibility.
 

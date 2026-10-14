@@ -6,5 +6,37 @@
     "LICENSE": "3a9b5b0d46996cdfd82b65429e189904e4ab1908014ce408cbecde9f591f37b4",
     "qassuanserver.cpp": "d6b39a27bb4c3ee4a8b23c4163f620c698e7326f3c96b888f6f67f7e0e763be1"
   },
-  "scope": "UI-only synthetic prototype; no persistent-cache operations; unchanged GnuPG"
+  "scope": "Pinned source inputs; five-patch compatibility and cache-free prototype are separate variants. No exact vendor-source claim.",
+  "upstream_repository": "https://github.com/sailfishos/sailfish-secrets",
+  "fork_repository": "https://github.com/misja/sailfish-secrets",
+  "fork_variants": {
+    "compat": {
+      "branch": "sailfish/native-pinentry-compat",
+      "commit": "3e79aaec2092ecc1ddd449d36b9ebc2bd724713b",
+      "files": {
+        "pinentry.cpp": "16e9082c8b0bc5d4eda96e5817f72a2058ad460b5dd77656b848ad65c5dead51",
+        "qassuanserver.cpp": "e6b47820bcb4addcc508ebefbfbdfe3b066064888d645e335440dd7b1cc75040",
+        "qassuanserver.h": "d9761e662e77498f206fbb126828aa032590be8dfab143c2f20c794eff1b3c14",
+        "pinentry.pro": "f637859ffc860e41f6745baf27e204664f68c9ee0ea5601a3c10bcfcea770fbb",
+        "assuancompat.h": "115e3eb7955744e5097af45c8862f8b2793dfef4ae13571ed0ca36d5426ccafe"
+      }
+    },
+    "cache-free": {
+      "branch": "sailfish/cache-free-prototype",
+      "commit": "f9d51e7f3fd6c214f7debab4aef66e63503f3b97",
+      "files": {
+        "pinentry.cpp": "a7704d471711974fb2c9eb74a15800e3af811d9f67bce424a79237ab4811ff62",
+        "qassuanserver.cpp": "2213337e124fca1f304209c59e090e4bf79beb1ccf92bc6b75c28577865eb44c",
+        "qassuanserver.h": "facdf041ca4d3bdc3808ce9da3baef53400ae8f0ff04e8236fdf830702eed183",
+        "pinentry.pro": "0ba2a8f24138f523d8db873513d7c4d50ad647fb5139fa149dd63b4a0df165b2"
+      }
+    }
+  },
+  "compatibility_patch_commits": [
+    "106eb6ea5176c6cd67107c6d0d6aa64ae16c4700",
+    "e3341d195d2d191fe6edc4ab8839bb392cf03d31",
+    "18dbc7f3aa4a76690719013486359470619daa97",
+    "a5f4c35e82dfcc07f4a3b1ac852d441b38236d66",
+    "3e79aaec2092ecc1ddd449d36b9ebc2bd724713b"
+  ]
 }

@@ -1,13 +1,9 @@
-From adfb0b175018fbcce8269879139e7c2e3fc6cd3a Mon Sep 17 00:00:00 2001
-From: misja <redacted@example.invalid>
-Date: Tue, 13 Oct 2026 10:44:58 +0200
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Misja Hoebe <36168+misja@users.noreply.github.com>
+Date: Wed, 14 Oct 2026 20:52:29 +0200
 Subject: [PATCH] pinentry: preserve explicit key information over descriptions
 
 Use the legacy description-derived identifier only before SETKEYINFO. An explicit empty identifier or --clear remains authoritative, and RESET clears identifier authority for the next request. Preserve the existing legacy description parser without claiming it is collision-safe.
----
- plugins/gnupgplugin/pinentry/qassuanserver.cpp | 10 +++++++---
- plugins/gnupgplugin/pinentry/qassuanserver.h   |  1 +
- 2 files changed, 8 insertions(+), 3 deletions(-)
 
 diff --git a/plugins/gnupgplugin/pinentry/qassuanserver.cpp b/plugins/gnupgplugin/pinentry/qassuanserver.cpp
 index e8abe1d..4c9e92f 100644
@@ -65,6 +61,3 @@ index 1946167..893a6e5 100644
  
      QString m_ctype;
      QString m_messages;
--- 
-2.55.0
-
