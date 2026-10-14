@@ -1,14 +1,10 @@
-From 39ef3cbae919df4126530c2e769f17efaeaab145 Mon Sep 17 00:00:00 2001
-From: misja <redacted@example.invalid>
-Date: Tue, 13 Oct 2026 10:32:59 +0200
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Misja Hoebe <36168+misja@users.noreply.github.com>
+Date: Wed, 14 Oct 2026 20:52:29 +0200
 Subject: [PATCH] pinentry: report external cache hits only for retrieved
  passwords
 
 Carry per-request provenance from successful StoredSecretRequest to GETPIN. Do not flag manually entered or newly stored passwords as cache hits. Stop before sending the password if writing the cache status fails. External cache permission policy is unchanged by this commit.
----
- plugins/gnupgplugin/pinentry/qassuanserver.cpp | 16 +++++++++++-----
- plugins/gnupgplugin/pinentry/qassuanserver.h   |  2 +-
- 2 files changed, 12 insertions(+), 6 deletions(-)
 
 diff --git a/plugins/gnupgplugin/pinentry/qassuanserver.cpp b/plugins/gnupgplugin/pinentry/qassuanserver.cpp
 index e9d1a90..21da163 100644
@@ -74,6 +70,3 @@ index 206fe59..cc1cb1e 100644
  };
  
  #endif
--- 
-2.55.0
-

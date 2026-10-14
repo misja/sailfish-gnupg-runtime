@@ -33,3 +33,5 @@ behavior remain open. Earlier 5.2.0.18 testing does not establish support for
 Development uses AI-assisted tools under maintainer review; see
 [CONTRIBUTING](CONTRIBUTING.md). Original work is [GPL-3.0-or-later](LICENSING.md);
 [upstream licenses](THIRD_PARTY.md) remain in force.
+
+See [fork and packaging maintenance](docs/FORK_WORKFLOW.md).

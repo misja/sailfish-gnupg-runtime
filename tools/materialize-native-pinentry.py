@@ -43,6 +43,12 @@ prepared = {name: source(variant["commit"], name) for name in variant["files"]}
 for name, data in prepared.items():
     if hashlib.sha256(data).hexdigest() != variant["files"][name]:
         raise SystemExit("Pinned fork source mismatch: " + name)
+for name, data in prepared.items():
+    if name.endswith((".cpp", ".h")):
+        for include in re.findall(rb'^\s*#include\s+"([^"]+)"', data, re.MULTILINE):
+            header = include.decode("ascii")
+            if header not in prepared:
+                raise SystemExit("Missing quoted local header in source lock: " + header)
 for name, data in original.items():
     write(root / "upstream", name, data)
 destination = root / ("prepared" if args.variant == "cache-free" else "compat")

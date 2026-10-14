@@ -17,7 +17,8 @@
         "pinentry.cpp": "16e9082c8b0bc5d4eda96e5817f72a2058ad460b5dd77656b848ad65c5dead51",
         "qassuanserver.cpp": "e6b47820bcb4addcc508ebefbfbdfe3b066064888d645e335440dd7b1cc75040",
         "qassuanserver.h": "d9761e662e77498f206fbb126828aa032590be8dfab143c2f20c794eff1b3c14",
-        "pinentry.pro": "f637859ffc860e41f6745baf27e204664f68c9ee0ea5601a3c10bcfcea770fbb"
+        "pinentry.pro": "f637859ffc860e41f6745baf27e204664f68c9ee0ea5601a3c10bcfcea770fbb",
+        "assuancompat.h": "115e3eb7955744e5097af45c8862f8b2793dfef4ae13571ed0ca36d5426ccafe"
       }
     },
     "cache-free": {

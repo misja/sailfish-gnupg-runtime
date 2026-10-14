@@ -1,13 +1,10 @@
-From 7a18593b273c68949edc1577faa5fb858ee56226 Mon Sep 17 00:00:00 2001
-From: misja <redacted@example.invalid>
-Date: Mon, 12 Oct 2026 21:57:22 +0200
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Misja Hoebe <36168+misja@users.noreply.github.com>
+Date: Wed, 14 Oct 2026 20:52:29 +0200
 Subject: [PATCH] pinentry: return source-qualified errors for optional agent
  options
 
 Report unsupported no-grab as NOT_SUPPORTED and the unimplemented external-cache negotiation option as UNKNOWN_OPTION. Both are tolerated by modern agents; the PINENTRY source preserves their interpretation across legacy Assuan serialization. This does not change or establish external cache permission policy.
----
- plugins/gnupgplugin/pinentry/qassuanserver.cpp | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/plugins/gnupgplugin/pinentry/qassuanserver.cpp b/plugins/gnupgplugin/pinentry/qassuanserver.cpp
 index b86b6d7..ef5d5eb 100644
@@ -31,6 +28,3 @@ index b86b6d7..ef5d5eb 100644
      } else if (!strcmp(key, "invisible-char")) {
          return ASSUAN_Not_Implemented;
      } else
--- 
-2.55.0
-
