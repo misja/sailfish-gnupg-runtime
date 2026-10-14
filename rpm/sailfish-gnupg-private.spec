@@ -52,8 +52,7 @@ mkdir -p %{buildroot}%{private_prefix}/licenses/project
 install -m 0644 LICENSE LICENSING.md %{buildroot}%{private_prefix}/licenses/project/
 for component in inspect/*; do
   name=$(basename "$component")
-  mkdir -p %{buildroot}%{private_prefix}/licenses/project
-install -m 0644 LICENSE LICENSING.md %{buildroot}%{private_prefix}/licenses/project//$name
+  mkdir -p "%{buildroot}%{private_prefix}/licenses/$name"
   for notice in "$component"/COPYING* "$component"/AUTHOR "$component"/AUTHORS "$component"/LICENSE*; do
     if test -e "$notice"; then
       cp -a "$notice" %{buildroot}%{private_prefix}/licenses/$name/
