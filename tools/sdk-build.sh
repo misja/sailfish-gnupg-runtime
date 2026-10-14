@@ -1,18 +1,18 @@
 #!/usr/bin/env bash
-# Inside the approved LXC project; builds the available feasibility target.
+# Build using an explicitly selected installed SDK/target; no dependency install.
 set -euo pipefail
 project_dir=$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
-test "$project_dir" = /home/ubuntu/gnupg-runtime || {
-  echo 'Run inside sailfish-sdk, not on the host' >&2; exit 1;
+sdk_root=${SAILFISH_SDK_ROOT:-"$HOME/SailfishOS"}
+: "${SAILFISH_SDK_TARGET:?Set the exact reviewed installed SDK build target}"
+test -x "$sdk_root/bin/sfdk" || {
+  echo 'Set SAILFISH_SDK_ROOT to an installed SDK directory' >&2; exit 1;
 }
 cd "$project_dir"
 test -f evidence/source-verification.json || {
-  echo 'First run python3 tools/fetch-sources.py' >&2; exit 1;
+  echo 'First authenticate sources with the sibling workspace tools/fetch-sources.py' >&2; exit 1;
 }
-# Override only after selecting and validating another installed SDK target.
-sdk_target=${SAILFISH_SDK_TARGET:-SailfishOS-5.1.0.11-aarch64}
 mkdir -p evidence
-/home/ubuntu/SailfishOS/bin/sfdk -c "target=$sdk_target" \
+"$sdk_root/bin/sfdk" -c "target=$SAILFISH_SDK_TARGET" \
   -c specfile=rpm/sailfish-gnupg-private.spec -c package.timeline \
   -c no-pull-build-requires -c no-vcs-apply build --prepare \
   2>&1 | tee evidence/latest-build.log

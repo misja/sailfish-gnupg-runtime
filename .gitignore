@@ -24,3 +24,6 @@ S.gpg-agent*
 /integrations/native-pinentry/upstream/*.h
 /integrations/native-pinentry/prepared/
 /integrations/native-pinentry/compat/
+
+# Generated public-source verification and local trial records
+/evidence/
