@@ -1,6 +1,6 @@
 # Private runtime lifecycle contract
 
-Status: proposed v1, 2026-10-15. Owner: sailfish-gnupg-runtime;
+Status: v1 basis reviewed and approved in PR #10, 2026-10-15. Owner: sailfish-gnupg-runtime;
 maintainer decision: Misja Hoebe. Tracking: [runtime issue #3](https://github.com/misja/sailfish-gnupg-runtime/issues/3).
 This defines required behavior for implementation and review. The present
 wrappers and RPM do not implement the complete contract. It grants no package
@@ -114,14 +114,16 @@ real user home, keyring or password store.
 | Foreign, deleted or changed executable/library | Host fixtures reject tested mismatches; real kernel mappings, ownership and races still need integration verification. |
 | Missing, symlinked, non-socket or permissive socket; malformed IPC reply | Host policy fixtures verify these admission decisions. Socket absence returns 3, not successful stop. |
 | Live-owner IPC timeout | Existing host observer confirms timeout cleanup in its bounded inert case. |
-| Wrapper TERM/KILL during IPC | Observer reproduces surviving IPC; runtime cleanup is not established. |
-| Concurrent starts, update drain and new-operation rejection | Requires shared admission implementation and race tests. |
+| Wrapper TERM/KILL during IPC | Direct IPC supervisor cleanup measured on host/SDK; full operation/descendant cleanup remains open. |
+| Concurrent starts, update drain and new-operation rejection | Experimental admission primitive and concurrency tests exist; wrapper/agent/package wiring remains open. |
 | In-flight operation, orphan/helper, PID reuse and deadline expiry | Requires implementation plus controlled interruption/identity tests. |
 | Changed executable/library upgrade and remove | Requires approved integration test with process/socket inventory and unrelated sentinels. Same-payload release bump is insufficient. |
 | Failed transaction, interrupted coordinator and recovery | Requires crash/failure injection and proof admission remains closed. |
 | Stock/user isolation and private data retention | Must be verified independently on the reviewed implementation; host fixtures alone do not establish it. |
 
-[Baseline measurements](lifecycle-baseline-20261015.md) record exact source
+[Current implementation slice](lifecycle-implementation-20261015.md) records the
+IPC change, experimental admission primitive and remaining integration gaps.
+Historical [baseline measurements](lifecycle-baseline-20261015.md) record exact source
 identities, commands and limits. Passing builder tests are not independent
 verification. Issue #3 remains open through implementation and verification
 separate from implementation. Human source review does not imply release approval.
