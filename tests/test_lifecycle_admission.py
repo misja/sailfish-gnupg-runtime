@@ -122,6 +122,43 @@ class AdmissionTests(unittest.TestCase):
         self.assertEqual(closer.returncode, 0, errors)
         self.assertEqual(output.strip(), 'DRAINED')
 
+    def test_agent_registration_survives_operation_drain(self):
+        operation = self.gate.acquire()
+        self.addCleanup(operation.close)
+        closer = self.process('print(gate.drain(5), flush=True)')
+        self.wait_state('DRAINING')
+        registration = self.gate.acquire_agent(operation)
+        self.addCleanup(registration.close)
+        operation.close()
+        output, error = closer.communicate(timeout=3)
+        self.assertEqual(closer.returncode, 0, error)
+        self.assertEqual(output.strip(), 'DRAINED')
+        self.assertTrue(self.gate.agents_registered())
+        registration.close()
+        self.assertFalse(self.gate.agents_registered())
+
+    def test_stop_requires_exclusive_operation_access(self):
+        with self.gate.acquire():
+            with self.assertRaises(BlockingIOError):
+                self.gate.acquire_stop()
+        with self.gate.acquire_stop():
+            with self.assertRaises(BlockingIOError):
+                self.gate.acquire()
+        self.gate.drain(0)
+        with self.gate.acquire_stop():
+            with self.assertRaises(AdmissionError):
+                self.gate.acquire()
+        self.assertEqual(self.gate.status()['state'], 'DRAINED')
+
+    def test_closed_or_stop_lease_cannot_register_an_agent(self):
+        operation = self.gate.acquire()
+        operation.close()
+        with self.assertRaises(AdmissionError):
+            self.gate.acquire_agent(operation)
+        with self.gate.acquire_stop() as stop:
+            with self.assertRaises(AdmissionError):
+                self.gate.acquire_agent(stop)
+
     def test_missing_state_never_defaults_to_active(self):
         (self.path / 'state.json').unlink()
         with self.assertRaises(FileNotFoundError):

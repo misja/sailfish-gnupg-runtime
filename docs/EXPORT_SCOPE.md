@@ -33,3 +33,8 @@ Original work is GPL-3.0-or-later, copyright (c) 2026 Misja Hoebe. See
 [LICENSING](../LICENSING.md) and [upstream exceptions](../THIRD_PARTY.md).
 Source publication is separate from package releases, device changes and
 upstream submissions.
+
+Current lifecycle candidate: [wrapper/agent admission](lifecycle-wrapper-integration-20261015.md).
+Release 0.4 requires Python 3 and prepared trusted root state; bootstrap, payload
+authentication and recovery remain open. No device installation is approved by
+the source changes.

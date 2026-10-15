@@ -3,7 +3,7 @@
 %global __requires_exclude ^lib(assuan|gcrypt|gpg-error|ksba|npth)\\.so.*$
 Name: sailfish-gnupg-private
 Version: 2.5.24
-Release: 0.3
+Release: 0.4
 Summary: Private GnuPG CLI feasibility runtime (not a release)
 License: GPL-3.0-or-later AND LGPL-2.1-or-later AND LGPL-3.0-or-later
 URL: https://gnupg.org/
@@ -13,6 +13,7 @@ Requires: /usr/bin/busybox
 Requires: /usr/bin/env
 Requires: /usr/bin/getent
 Requires: /usr/bin/id
+Requires: /usr/bin/python3
 Requires: (/bin/stat or /usr/bin/stat)
 
 %description
@@ -63,10 +64,12 @@ done
 find %{buildroot}%{private_prefix} -name '*.la' -delete
 rm -rf %{buildroot}%{private_prefix}/include %{buildroot}%{private_prefix}/lib/pkgconfig
 rm -f %{buildroot}%{private_prefix}/bin/gpgrt-config %{buildroot}%{private_prefix}/bin/gpg-error-config
-mkdir -p %{buildroot}/usr/bin
+mkdir -p %{buildroot}/usr/bin %{buildroot}%{private_prefix}/libexec
 install -m 0755 runtime/sailfish-gpg %{buildroot}/usr/bin/sailfish-gpg
 install -m 0755 runtime/sailfish-gpg-agent %{buildroot}/usr/bin/sailfish-gpg-agent
 install -m 0644 runtime/runtime-policy.sh %{buildroot}%{private_prefix}/libexec/runtime-policy.sh
+install -m 0644 runtime/lifecycle_admission.py runtime/lifecycle-entry.py %{buildroot}%{private_prefix}/libexec/
+install -m 0755 runtime/gpg-operation runtime/agent-operation %{buildroot}%{private_prefix}/libexec/
 
 %files
 %{private_prefix}

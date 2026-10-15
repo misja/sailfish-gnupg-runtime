@@ -1,0 +1,109 @@
+{
+  "schema": 1,
+  "date": "2026-10-15",
+  "base_commit": "9ec4a0fa72c2c9c55638fc03e227e723410e5046",
+  "tested_files_sha256": {
+    "runtime/sailfish-gpg-agent": "a764b5eb1e2ea0d8affa998e0e859289b80a954eb5c82bbb94cb13c3e4ba3f58",
+    "runtime/lifecycle_admission.py": "49885c0c936a136b5ad6b3b58ea5c48b7390fb3f2839cf02c85da92ecbc4bbbf",
+    "runtime/agent-operation": "3e43300dacf655f3fdbd3ddce59a8698ac14b82ae248811556643d5c3b46c027",
+    "runtime/lifecycle-entry.py": "9bd758fd277df41256d73adff46ea377d2af007a4bbafccc05aab11cd75998e3",
+    "runtime/gpg-operation": "e2e734bd763e503cfb630af31c1f458f3ed4c2bf859ed3d131224e8bb6d51e41",
+    "runtime/sailfish-gpg": "97b30c4265fe8de4e335fc21ef6588ee2f5b35b2aab6f4499197c99fa75ad0f7",
+    "runtime/runtime-policy.sh": "0b2418f759ade3cd5c50f16a3e7aa422b8f3125f91ee5c89a5ca21769cd5c5d4",
+    "tests/test_agent_policy.py": "50fcc1e19c96e9915713229ca12d949f3236e5a291e211fb3ff31cb4cc974144",
+    "tests/test_ipc_supervisor.py": "8fc7ad3bb52a646d88159b0aacf8b8e504aae419b2e34b9efdf986e2fb5a6e62",
+    "tests/test_lifecycle_admission.py": "f1958d6c8adbda8f004e1cea3a84d34f8817c5e3b027b6f8eca5b5017d896c25",
+    "tests/test_lifecycle_entry.py": "75522e4a5818a55c210ea23aca92b866880eea140a448e2942fc424854a2cd46",
+    "tools/test-interrupted-watchdog.py": "088a30f9fa0580defd051c04cde8bca7991e4e3c6dc1646b162154f4b0d6a171",
+    "rpm/sailfish-gnupg-private.spec": "3825c14ace98f37ff8a67cf3e30329221b4a7298b9dbdd300665629141d0f5ee"
+  },
+  "host": {
+    "repository_tests_passed": 55
+  },
+  "sdk": {
+    "version": "3.13.5",
+    "target": "SailfishOS-5.1.0.11-aarch64",
+    "selected_tests_passed": 50,
+    "observer": {
+      "scope": "host-only synthetic IPC lifecycle; no crypto/device acceptance",
+      "source_sha256": "0b2418f759ade3cd5c50f16a3e7aa422b8f3125f91ee5c89a5ca21769cd5c5d4",
+      "timer_substitution": "15 seconds -> 1 second in temporary copy only",
+      "cases": [
+        {
+          "case": "owner_alive",
+          "owner_exitcode": 124,
+          "ipc_alive_after_observation": false,
+          "wrapper_cleanup_established": true,
+          "observer_cleanup": true
+        },
+        {
+          "case": "owner_TERM",
+          "owner_exitcode": -15,
+          "ipc_alive_after_observation": false,
+          "wrapper_cleanup_established": true,
+          "observer_cleanup": true
+        },
+        {
+          "case": "owner_KILL",
+          "owner_exitcode": -9,
+          "ipc_alive_after_observation": false,
+          "wrapper_cleanup_established": true,
+          "observer_cleanup": true
+        }
+      ],
+      "interrupted_owner_cleanup_proven": true
+    },
+    "staging": {
+      "scope": "SDK install-fragment staging and recipe parsing only; no RPM build or installation",
+      "files": {
+        "usr/bin/sailfish-gpg": {
+          "sha256": "97b30c4265fe8de4e335fc21ef6588ee2f5b35b2aab6f4499197c99fa75ad0f7",
+          "mode": "0o755"
+        },
+        "usr/bin/sailfish-gpg-agent": {
+          "sha256": "a764b5eb1e2ea0d8affa998e0e859289b80a954eb5c82bbb94cb13c3e4ba3f58",
+          "mode": "0o755"
+        },
+        "usr/libexec/sailfish-gnupg/libexec/runtime-policy.sh": {
+          "sha256": "0b2418f759ade3cd5c50f16a3e7aa422b8f3125f91ee5c89a5ca21769cd5c5d4",
+          "mode": "0o644"
+        },
+        "usr/libexec/sailfish-gnupg/libexec/lifecycle-entry.py": {
+          "sha256": "9bd758fd277df41256d73adff46ea377d2af007a4bbafccc05aab11cd75998e3",
+          "mode": "0o644"
+        },
+        "usr/libexec/sailfish-gnupg/libexec/lifecycle_admission.py": {
+          "sha256": "49885c0c936a136b5ad6b3b58ea5c48b7390fb3f2839cf02c85da92ecbc4bbbf",
+          "mode": "0o644"
+        },
+        "usr/libexec/sailfish-gnupg/libexec/gpg-operation": {
+          "sha256": "e2e734bd763e503cfb630af31c1f458f3ed4c2bf859ed3d131224e8bb6d51e41",
+          "mode": "0o755"
+        },
+        "usr/libexec/sailfish-gnupg/libexec/agent-operation": {
+          "sha256": "3e43300dacf655f3fdbd3ddce59a8698ac14b82ae248811556643d5c3b46c027",
+          "mode": "0o755"
+        }
+      },
+      "python3_requires": true,
+      "release": "0.4"
+    }
+  },
+  "checks": [
+    "fixed public wrapper dispatch with temporary prefix/state/owner substitutions only in test copies",
+    "operation guardian retains registration after caller TERM/KILL and child descriptor closure",
+    "persistent agent registration survives operation drain",
+    "one stable per-home/generation/agent watch lock is reused",
+    "stop exclusive against operations and allowed after DRAINED",
+    "missing/closed/unsafe state and unverified reports fail",
+    "SDK recipe staging verifies seven exact files and modes; rpmspec parses Python dependency and release 0.4"
+  ],
+  "limits": [
+    "No RPM build/installation or real GnuPG invocation in this slice.",
+    "Python 3 becomes an explicit runtime dependency; device availability/footprint not verified.",
+    "Trusted root state bootstrap, payload-generation authentication and recovery are not provided.",
+    "DRAINED and agent registration counts do not establish complete process/socket quiescence.",
+    "Guardian/watch death, unregistered callers and arbitrary descendants require maintenance-side verification.",
+    "No changed-payload integration, device test or independent security/release verification."
+  ]
+}

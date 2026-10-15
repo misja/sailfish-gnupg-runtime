@@ -67,12 +67,16 @@ for name, source, mode in [
     ('usr/bin/sailfish-gpg', 'sailfish-gpg', 0o755),
     ('usr/bin/sailfish-gpg-agent', 'sailfish-gpg-agent', 0o755),
     ('usr/libexec/sailfish-gnupg/libexec/runtime-policy.sh', 'runtime-policy.sh', 0o644),
+    ('usr/libexec/sailfish-gnupg/libexec/lifecycle_admission.py', 'lifecycle_admission.py', 0o644),
+    ('usr/libexec/sailfish-gnupg/libexec/lifecycle-entry.py', 'lifecycle-entry.py', 0o644),
+    ('usr/libexec/sailfish-gnupg/libexec/gpg-operation', 'gpg-operation', 0o755),
+    ('usr/libexec/sailfish-gnupg/libexec/agent-operation', 'agent-operation', 0o755),
 ]:
     actual_mode, data = entries[name]
     assert data == (root / 'runtime' / source).read_bytes(), name
     assert stat.S_ISREG(actual_mode), name
     assert actual_mode & 0o7777 == mode, name
-for requirement in ['/usr/bin/busybox', '/usr/bin/env', '/usr/bin/getent', '/usr/bin/id']:
+for requirement in ['/usr/bin/busybox', '/usr/bin/env', '/usr/bin/getent', '/usr/bin/id', '/usr/bin/python3']:
     assert requirement in record['requires'].splitlines(), requirement
 assert '(/bin/stat or /usr/bin/stat)' in record['requires'].splitlines()
 elf_records = []
@@ -114,6 +118,8 @@ with tarfile.open(fileobj=io.BytesIO(source_entries[capsule_name][1])) as archiv
     for name in ['LICENSE', 'LICENSING.md', 'tools/build-runtime.sh',
                  'tools/prepare-sources.py', 'runtime/sailfish-gpg',
                  'runtime/sailfish-gpg-agent', 'runtime/runtime-policy.sh',
+                 'runtime/lifecycle_admission.py', 'runtime/lifecycle-entry.py',
+                 'runtime/gpg-operation', 'runtime/agent-operation',
                  'sources/signature_key.asc', 'evidence/source-verification.json']:
         assert name in provenance['files'], name
 record['source_package'] = {
