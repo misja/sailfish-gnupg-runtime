@@ -3,7 +3,7 @@
 
 The observer owns a separate process group for each case and always removes it.
 Only a temporary policy copy has its 15-second timer shortened to one second.
-An interrupted owner is a boundary measurement, not a required passing cleanup.
+Use --require-cleanup to make surviving IPC fail the regression check.
 """
 import argparse
 import hashlib
@@ -17,6 +17,7 @@ import time
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--output', type=Path, required=True)
+parser.add_argument('--require-cleanup', action='store_true')
 args = parser.parse_args()
 source = Path(__file__).resolve().parents[1] / 'runtime/runtime-policy.sh'
 text = source.read_text()
@@ -91,3 +92,5 @@ record['interrupted_owner_cleanup_proven'] = all(
     case['wrapper_cleanup_established'] for case in record['cases'])
 args.output.write_text(json.dumps(record, indent=2) + '\n')
 print(json.dumps(record, indent=2))
+if args.require_cleanup and not record['interrupted_owner_cleanup_proven']:
+    raise SystemExit('FAIL: inert IPC survived an interrupted owner')

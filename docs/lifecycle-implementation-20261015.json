@@ -1,0 +1,120 @@
+{
+  "schema": 1,
+  "date": "2026-10-15",
+  "base_commit": "ac206931dba69670490aae112c417d77b7112371",
+  "tested_files_sha256": {
+    "runtime/runtime-policy.sh": "c53b6e866cabae2cb46dfed30690a2eb4e1cb47d2ca7a6302937d4f3959af6a0",
+    "runtime/lifecycle_admission.py": "b7992e070bf305c96c02569d40be9d26ff75713039365ac413bd7b554b073f51",
+    "tools/test-interrupted-watchdog.py": "088a30f9fa0580defd051c04cde8bca7991e4e3c6dc1646b162154f4b0d6a171",
+    "tests/test_agent_policy.py": "50fcc1e19c96e9915713229ca12d949f3236e5a291e211fb3ff31cb4cc974144",
+    "tests/test_lifecycle_admission.py": "960875fde6330143933783c357cf31eea38cf233ddc821e5f4e90b0dc7355c15",
+    "tests/test_ipc_supervisor.py": "8fc7ad3bb52a646d88159b0aacf8b8e504aae419b2e34b9efdf986e2fb5a6e62"
+  },
+  "host": {
+    "repository_tests_passed": 39,
+    "observer": {
+      "scope": "host-only synthetic IPC lifecycle; no crypto/device acceptance",
+      "source_sha256": "c53b6e866cabae2cb46dfed30690a2eb4e1cb47d2ca7a6302937d4f3959af6a0",
+      "timer_substitution": "15 seconds -> 1 second in temporary copy only",
+      "cases": [
+        {
+          "case": "owner_alive",
+          "owner_exitcode": 124,
+          "ipc_alive_after_observation": false,
+          "wrapper_cleanup_established": true,
+          "observer_cleanup": true
+        },
+        {
+          "case": "owner_TERM",
+          "owner_exitcode": -15,
+          "ipc_alive_after_observation": false,
+          "wrapper_cleanup_established": true,
+          "observer_cleanup": true
+        },
+        {
+          "case": "owner_KILL",
+          "owner_exitcode": -9,
+          "ipc_alive_after_observation": false,
+          "wrapper_cleanup_established": true,
+          "observer_cleanup": true
+        }
+      ],
+      "interrupted_owner_cleanup_proven": true
+    }
+  },
+  "sdk": {
+    "version": "3.13.5",
+    "target": "SailfishOS-5.1.0.11-aarch64",
+    "selected_policy_admission_ipc_tests_passed": 34,
+    "observer": {
+      "scope": "host-only synthetic IPC lifecycle; no crypto/device acceptance",
+      "source_sha256": "c53b6e866cabae2cb46dfed30690a2eb4e1cb47d2ca7a6302937d4f3959af6a0",
+      "timer_substitution": "15 seconds -> 1 second in temporary copy only",
+      "cases": [
+        {
+          "case": "owner_alive",
+          "owner_exitcode": 124,
+          "ipc_alive_after_observation": false,
+          "wrapper_cleanup_established": true,
+          "observer_cleanup": true
+        },
+        {
+          "case": "owner_TERM",
+          "owner_exitcode": -15,
+          "ipc_alive_after_observation": false,
+          "wrapper_cleanup_established": true,
+          "observer_cleanup": true
+        },
+        {
+          "case": "owner_KILL",
+          "owner_exitcode": -9,
+          "ipc_alive_after_observation": false,
+          "wrapper_cleanup_established": true,
+          "observer_cleanup": true
+        }
+      ],
+      "interrupted_owner_cleanup_proven": true
+    },
+    "fixtures_tmpdir": "/home/ubuntu/sflc-tmp-20261015"
+  },
+  "baseline_regression": {
+    "expected_exit": 1,
+    "actual_exit": 1,
+    "observer": {
+      "scope": "host-only synthetic IPC lifecycle; no crypto/device acceptance",
+      "source_sha256": "e00a473691ec76f10ecef86249293d195194d586f60d18605933de0bf14bc5e8",
+      "timer_substitution": "15 seconds -> 1 second in temporary copy only",
+      "cases": [
+        {
+          "case": "owner_alive",
+          "owner_exitcode": 137,
+          "ipc_alive_after_observation": false,
+          "wrapper_cleanup_established": true,
+          "observer_cleanup": true
+        },
+        {
+          "case": "owner_TERM",
+          "owner_exitcode": -15,
+          "ipc_alive_after_observation": true,
+          "wrapper_cleanup_established": false,
+          "observer_cleanup": true
+        },
+        {
+          "case": "owner_KILL",
+          "owner_exitcode": -9,
+          "ipc_alive_after_observation": true,
+          "wrapper_cleanup_established": false,
+          "observer_cleanup": true
+        }
+      ],
+      "interrupted_owner_cleanup_proven": false
+    }
+  },
+  "limits": [
+    "Admission primitive is not installed or wired into runtime wrappers/RPM hooks.",
+    "DRAINED describes descriptor leases only, not process/agent/socket quiescence.",
+    "Direct private-binary callers and helpers that close inherited descriptors are not covered.",
+    "Supervisor lifetime and direct-child timeout tested; supervisor death and arbitrary descendant cleanup not established.",
+    "No package rebuild, installation, device action or independent security/release verification."
+  ]
+}

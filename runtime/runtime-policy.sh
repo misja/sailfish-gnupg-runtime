@@ -25,7 +25,16 @@ policy_process_identity() {
     process_identity="$process_parent:$1"
 }
 
+# Own the IPC and its watchdog in a separate process. If the calling wrapper
+# disappears, their parent identity remains stable until bounded cleanup finishes.
+# This supervises one direct IPC helper, not arbitrary daemon descendants.
 runtime_timed() {
+    ( runtime_timed_supervised "$@" ) &
+    supervisor_pid=$!
+    if wait "$supervisor_pid"; then return 0; else return "$?"; fi
+}
+
+runtime_timed_supervised() {
     (
         exec /usr/bin/env -i PATH=/usr/bin:/bin HOME="$SAILFISH_GNUPGHOME" \
             LANG="${LANG:-C}" LC_ALL="${LC_ALL:-}" TERM="${TERM:-dumb}" \
@@ -36,6 +45,7 @@ runtime_timed() {
     if policy_process_identity "$ipc_pid"; then ipc_identity=$process_identity; else ipc_identity=; fi
     (
         watchdog_cancelled=0
+        watchdog_result=0
         trap 'watchdog_cancelled=1' TERM INT
         /usr/bin/busybox sleep 15 &
         sleeper_pid=$!
@@ -46,12 +56,14 @@ runtime_timed() {
         fi
         wait "$sleeper_pid" 2>/dev/null || :
         if test "$watchdog_cancelled" = 0 && test -n "$ipc_identity" && policy_process_identity "$ipc_pid" 2>/dev/null && test "$process_identity" = "$ipc_identity"; then
+            watchdog_result=124
             kill -TERM "$ipc_pid" 2>/dev/null || :
             /usr/bin/busybox sleep 1
             if test "$watchdog_cancelled" = 0 && policy_process_identity "$ipc_pid" 2>/dev/null && test "$process_identity" = "$ipc_identity"; then
                 kill -KILL "$ipc_pid" 2>/dev/null || :
             fi
         fi
+        exit "$watchdog_result"
     ) &
     watchdog_pid=$!
     if policy_process_identity "$watchdog_pid"; then watchdog_identity=$process_identity; else watchdog_identity=; fi
@@ -59,8 +71,14 @@ runtime_timed() {
     if test -n "$watchdog_identity" && policy_process_identity "$watchdog_pid" 2>/dev/null && test "$process_identity" = "$watchdog_identity"; then
         kill -TERM "$watchdog_pid" 2>/dev/null || :
     fi
-    wait "$watchdog_pid" 2>/dev/null || :
-    return "$ipc_result"
+    if wait "$watchdog_pid" 2>/dev/null; then watchdog_result=0; else watchdog_result=$?; fi
+    # A helper's apparent success after timeout (including emulated execution)
+    # must never turn a timed-out IPC request into successful admission.
+    case "$watchdog_result" in
+        0) return "$ipc_result" ;;
+        124) return 124 ;;
+        *) return 78 ;;
+    esac
 }
 
 policy_home() {
