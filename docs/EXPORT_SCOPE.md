@@ -34,9 +34,9 @@ Original work is GPL-3.0-or-later, copyright (c) 2026 Misja Hoebe. See
 Source publication is separate from package releases, device changes and
 upstream submissions.
 
-Current lifecycle candidate: [trusted-state recovery](lifecycle-trusted-state-20261015.md).
-Release 0.5 requires Python 3 and system flock. Cold bootstrap and same-generation
-recovery exist. [Generation-transition state primitives](lifecycle-transition-state-20261015.md)
-record a destination and explicit reconciliation; package-writer supervision,
-changed-payload package integration and device acceptance remain open.
-No device installation is approved by the source changes.
+Current runtime uses the shell wrappers and bounded IPC supervisor. The custom
+Python admission/watch/generation/recovery layer and payload-manifest RPM hooks
+have been removed. Python remains a build/test tool, not an installed runtime
+requirement. See the [maintenance policy](lifecycle-contract.md): no global
+start exclusion or supported automatic upgrade/removal path is implemented.
+No device installation is approved by these source changes.

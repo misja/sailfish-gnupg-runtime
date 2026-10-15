@@ -10,6 +10,3 @@
 - [Private-runtime lifecycle contract](lifecycle-contract.md)
 - [Lifecycle baseline and interruption findings](lifecycle-baseline-20261015.md)
 - [Lifecycle implementation and SDK checks](lifecycle-implementation-20261015.md)
-- [Wrapper and persistent-agent admission](lifecycle-wrapper-integration-20261015.md)
-- [Trusted state and same-generation recovery](lifecycle-trusted-state-20261015.md)
-- [Generation-transition state primitives](lifecycle-transition-state-20261015.md)

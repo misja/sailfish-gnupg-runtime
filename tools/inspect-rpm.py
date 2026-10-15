@@ -67,49 +67,14 @@ for name, source, mode in [
     ('usr/bin/sailfish-gpg', 'sailfish-gpg', 0o755),
     ('usr/bin/sailfish-gpg-agent', 'sailfish-gpg-agent', 0o755),
     ('usr/libexec/sailfish-gnupg/libexec/runtime-policy.sh', 'runtime-policy.sh', 0o644),
-    ('usr/libexec/sailfish-gnupg/libexec/lifecycle_admission.py', 'lifecycle_admission.py', 0o644),
-    ('usr/libexec/sailfish-gnupg/libexec/lifecycle-entry.py', 'lifecycle-entry.py', 0o644),
-    ('usr/libexec/sailfish-gnupg/libexec/lifecycle_control.py', 'lifecycle_control.py', 0o644),
-    ('usr/libexec/sailfish-gnupg/libexec/lifecycle-admin.py', 'lifecycle-admin.py', 0o644),
-    ('usr/libexec/sailfish-gnupg/libexec/gpg-operation', 'gpg-operation', 0o755),
-    ('usr/libexec/sailfish-gnupg/libexec/agent-operation', 'agent-operation', 0o755),
 ]:
     actual_mode, data = entries[name]
     assert data == (root / 'runtime' / source).read_bytes(), name
     assert stat.S_ISREG(actual_mode), name
     assert actual_mode & 0o7777 == mode, name
-for requirement in ['/usr/bin/busybox', '/usr/bin/env', '/usr/bin/getent', '/usr/bin/id', '/usr/bin/python3', '/usr/bin/flock']:
+for requirement in ['/usr/bin/busybox', '/usr/bin/env', '/usr/bin/getent', '/usr/bin/id']:
     assert requirement in record['requires'].splitlines(), requirement
 assert '(/bin/stat or /usr/bin/stat)' in record['requires'].splitlines()
-# Bind the manifest to final packaged bytes, including files changed by RPM
-# postprocessing. No payload extraction or packaged code execution is needed.
-manifest_name = 'usr/libexec/sailfish-gnupg/libexec/payload-generation.json'
-assert stat.S_ISREG(entries[manifest_name][0]) and stat.S_IMODE(entries[manifest_name][0]) == 0o644
-manifest_raw = entries[manifest_name][1]
-manifest = json.loads(manifest_raw)
-assert set(manifest) == {'schema', 'entries'} and manifest['schema'] == 1
-manifest_paths = set()
-for relative, expected in manifest['entries'].items():
-    if relative.startswith('@entry/'):
-        assert relative in ('@entry/sailfish-gpg', '@entry/sailfish-gpg-agent')
-        name = 'usr/bin/' + relative.split('/')[1]
-    else:
-        assert not relative.startswith('/') and '..' not in Path(relative).parts
-        name = 'usr/libexec/sailfish-gnupg' + ('' if relative == '.' else '/' + relative)
-    manifest_paths.add(name)
-    mode, data = entries[name]
-    if expected['kind'] == 'link':
-        assert stat.S_ISLNK(mode) and data.decode() == expected['target'], name
-    elif expected['kind'] == 'directory':
-        assert stat.S_ISDIR(mode) and oct(stat.S_IMODE(mode)) == expected['mode'], name
-    else:
-        assert expected['kind'] == 'file' and stat.S_ISREG(mode), name
-        assert oct(stat.S_IMODE(mode)) == expected['mode'], name
-        assert hashlib.sha256(data).hexdigest() == expected['sha256'], name
-assert manifest_paths == set(entries) - {manifest_name}, 'Manifest coverage differs from packaged payload'
-owners = subprocess.check_output(['rpm', '-qp', '--qf', '[%{FILENAMES} %{FILEUSERNAME} %{FILEGROUPNAME}\n]', str(artifact)], text=True)
-assert all(line.endswith(' root root') for line in owners.splitlines())
-record['payload_generation'] = hashlib.sha256(manifest_raw).hexdigest()
 elf_records = []
 with tempfile.TemporaryDirectory(prefix='synthetic-rpm-elf-') as temporary:
     for name, (mode, data) in sorted(entries.items()):
@@ -149,10 +114,6 @@ with tarfile.open(fileobj=io.BytesIO(source_entries[capsule_name][1])) as archiv
     for name in ['LICENSE', 'LICENSING.md', 'tools/build-runtime.sh',
                  'tools/prepare-sources.py', 'runtime/sailfish-gpg',
                  'runtime/sailfish-gpg-agent', 'runtime/runtime-policy.sh',
-                 'runtime/lifecycle_admission.py', 'runtime/lifecycle-entry.py',
-                 'runtime/gpg-operation', 'runtime/agent-operation',
-                 'runtime/lifecycle_control.py', 'runtime/lifecycle-admin.py',
-                 'tools/build-payload-manifest.py',
                  'sources/signature_key.asc', 'evidence/source-verification.json']:
         assert name in provenance['files'], name
 record['source_package'] = {

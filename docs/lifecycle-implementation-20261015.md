@@ -1,9 +1,12 @@
-# Lifecycle implementation slice — 2026-10-15
+# IPC supervision evidence — 2026-10-15
+
+Historical test record: the admission prototype described by the original PR
+and its recorded test counts has since been removed. Only IPC supervision is
+retained; these historical counts are not current-suite counts.
 
 Basis: reviewed [contract](lifecycle-contract.md), merged in PR #10 at
 `ac206931dba69670490aae112c417d77b7112371`. Tracking: [issue #3](https://github.com/misja/sailfish-gnupg-runtime/issues/3).
-This slice fixes direct IPC supervision and implements an experimental admission
-primitive. Full wrapper/agent/package coordination remains open.
+The retained change fixes direct IPC supervision. Package coordination remains open.
 
 ## Direct IPC supervision
 
@@ -27,40 +30,6 @@ KILL. Live-owner timeout returned 124. The old policy failed the same regression
 This does not establish cleanup after the supervisor itself dies, arbitrary
 helper descendants, daemon agents or a whole interrupted GnuPG operation.
 
-## Experimental admission primitive
-
-`runtime/lifecycle_admission.py` is a callable implementation exercised by tests.
-It is not installed by the RPM or called by either wrapper. It introduces no
-installed Python dependency or automatic state-directory creation at runtime.
-
-The prototype uses a stable admission lock for the ACTIVE check and lease
-registration, and a separate shared operation lock. Maintenance closes admission
-under the first lock before waiting for exclusive ownership of the second.
-Several operations may share one generation while ACTIVE. A generation is an
-explicit SHA-256-shaped identifier; authenticating a complete installed payload
-against it is still an integration responsibility.
-
-`Lease.spawn` explicitly passes the operation descriptor to its child. Closing
-the parent's copy does not unlock an inherited descriptor; a killed client can
-therefore leave a registered, still-running child. A drain deadline produces
-BLOCKED, and a killed coordinator leaves DRAINING. Neither state automatically
-reopens admission. There is deliberately no resume/recovery API yet.
-
-The directory/state/locks require the expected owner, fixed modes and canonical
-non-symlink paths. Missing or invalid state is rejected. State transitions use
-atomic replacement and fsync. Initialization is explicit, owner-only and never
-replaces an existing lock directory. Tests use only their own temporary owner
-and directory, supplied directly to the API; the production expected owner
-default is root. Cross-user operation and real root-owned deployment still need
-separate verification. Atomic-write code is not evidence of power-loss recovery.
-
-DRAINED is an internal lease-only result, **not QUIESCENT** and not permission to
-change packages. A child that closes the descriptor, an unregistered caller or
-a persistent agent can outlive the registered operation. Wrapper wiring must
-resolve those cases before package transactions use this primitive. Direct
-callers, global ownership across reboot, agent control, payload verification,
-trusted state initialization and recovery remain integration work. Runtime
-language/dependency choice must be reviewed before shipping the primitive.
 
 ## Executed verification
 
