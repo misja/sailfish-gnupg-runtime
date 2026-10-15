@@ -47,7 +47,7 @@ class Lease:
 
 
 class Admission:
-    STATES = {"ACTIVE", "DRAINING", "DRAINED", "BLOCKED"}
+    STATES = {"ACTIVE", "DRAINING", "DRAINED", "BLOCKED", "UPDATING"}
 
     def __init__(self, directory, *, expected_uid=0):
         self.directory = Path(directory)
@@ -101,19 +101,38 @@ class Admission:
             raise AdmissionError("Oversized admission state")
         try:
             state = json.loads(raw)
-            if set(state) != {"state", "generation"} or state["state"] not in self.STATES:
+            if not isinstance(state, dict) or state.get("state") not in self.STATES:
+                raise ValueError()
+            expected = {"state", "generation"}
+            if state["state"] == "UPDATING":
+                expected.add("target")
+                self._generation(state.get("target"))
+                if state["target"] == state.get("generation"):
+                    raise ValueError()
+            if set(state) != expected:
                 raise ValueError()
             self._generation(state["generation"])
         except (ValueError, TypeError, AdmissionError) as error:
             raise AdmissionError("Invalid admission state") from error
         return state
 
-    def _write(self, directory, state, generation):
+    def _write(self, directory, state, generation, *, target=None):
+        self._generation(generation)
+        if state not in self.STATES:
+            raise AdmissionError("Invalid admission state")
+        record = {"state": state, "generation": generation}
+        if state == "UPDATING":
+            self._generation(target)
+            if target == generation:
+                raise AdmissionError("Transition requires a different generation")
+            record["target"] = target
+        elif target is not None:
+            raise AdmissionError("Unexpected transition target")
         name = ".state-" + secrets.token_hex(16)
         fd = os.open(name, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW,
                      0o600, dir_fd=directory)
         try:
-            payload = (json.dumps({"state": state, "generation": generation}) + "\n").encode()
+            payload = (json.dumps(record) + "\n").encode()
             with os.fdopen(fd, "wb") as stream:
                 stream.write(payload)
                 stream.flush()

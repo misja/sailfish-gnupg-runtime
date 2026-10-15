@@ -1,0 +1,40 @@
+{
+  "base_commit": "f55de2d6da3ad3213b8d18e18f03de7e7360b9d1",
+  "base_pr": 13,
+  "date": "2026-10-15",
+  "host_tests": {
+    "command": "python3 -m unittest discover -s tests -q",
+    "passed": 92
+  },
+  "limits": [
+    "Internal state primitives only; no package writer or new CLI action",
+    "Writer supervision and continuous loader exclusion across mutation remain unimplemented",
+    "No real root state, real GnuPG, RPM build/install, device or OBS action",
+    "Process interruption and atomic-replace fault injection, not power-loss verification",
+    "Implementation self-tests, not independent security verification"
+  ],
+  "sdk_staged_hashes_verified": true,
+  "sdk_tests": {
+    "command": "sfdk -c target=SailfishOS-5.1.0.11-aarch64 build-shell /usr/bin/env TMPDIR=/home/ubuntu/sflc-tmp-20261015 python3 -m unittest discover -s build/transition-review/tests -q",
+    "passed": 87,
+    "scope": "public runtime and five selected test modules; five source/package fixture tests run only on host",
+    "sdk": "3.13.5",
+    "target": "SailfishOS-5.1.0.11-aarch64"
+  },
+  "tested_files_sha256": {
+    "runtime/agent-operation": "3e43300dacf655f3fdbd3ddce59a8698ac14b82ae248811556643d5c3b46c027",
+    "runtime/gpg-operation": "e2e734bd763e503cfb630af31c1f458f3ed4c2bf859ed3d131224e8bb6d51e41",
+    "runtime/lifecycle-admin.py": "635e8939c2acfd2ee6ecc242e9930bea1c92777aa0a7662fcc2ce9d5904badf6",
+    "runtime/lifecycle-entry.py": "8d962214b7e23242f30f8bf2d2bb95fc99491845bbc6d2c6440e048ecb825f3c",
+    "runtime/lifecycle_admission.py": "2b9e3c4487097797ea845cf81c32582eea760b4b75a5d2b7633f07377d674eeb",
+    "runtime/lifecycle_control.py": "c7338a73740800d4a9e18df2d1765351833eec4c39603cab0c06d5d56ef6e786",
+    "runtime/runtime-policy.sh": "0b2418f759ade3cd5c50f16a3e7aa422b8f3125f91ee5c89a5ca21769cd5c5d4",
+    "runtime/sailfish-gpg": "a985a14a385ae620ef430dd71b6c1721697003afea503c38a1419115243c86ac",
+    "runtime/sailfish-gpg-agent": "f982965e3b631b0849f0630618e665813caf2190e5786cb8cfd46638a58dd9f3",
+    "tests/test_agent_policy.py": "50fcc1e19c96e9915713229ca12d949f3236e5a291e211fb3ff31cb4cc974144",
+    "tests/test_ipc_supervisor.py": "8fc7ad3bb52a646d88159b0aacf8b8e504aae419b2e34b9efdf986e2fb5a6e62",
+    "tests/test_lifecycle_admission.py": "f1958d6c8adbda8f004e1cea3a84d34f8817c5e3b027b6f8eca5b5017d896c25",
+    "tests/test_lifecycle_control.py": "043d5a2b472bd7b8da862776838fd4dab4cf7e1ea587110aeea64c8cb7b87195",
+    "tests/test_lifecycle_entry.py": "6d647bcd137cfe7ad983acf359071f40619bf7959ac622479056e67637a8c4db"
+  }
+}

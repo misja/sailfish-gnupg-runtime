@@ -123,7 +123,9 @@ real user home, keyring or password store.
 | Failed transaction, interrupted coordinator and recovery | Same-generation drain/recovery tested with retained lock inodes and early loader exclusion; package transactions and power-loss recovery remain open. |
 | Stock/user isolation and private data retention | Must be verified independently on the reviewed implementation; host fixtures alone do not establish it. |
 
-[Trusted-state implementation](lifecycle-trusted-state-20261015.md) records the
+[Transition-state primitives](lifecycle-transition-state-20261015.md) record a
+predeclared destination and explicit reconciliation without package-writer
+integration. [Trusted-state implementation](lifecycle-trusted-state-20261015.md) records the
 current bootstrap/payload/recovery boundary. [Wrapper integration](lifecycle-wrapper-integration-20261015.md) records
 operation/agent admission and remaining integration gaps. The earlier
 [implementation slice](lifecycle-implementation-20261015.md) records IPC supervision

@@ -197,5 +197,209 @@ class ControlTests(unittest.TestCase):
         self.assertFalse(gate.directory.exists())
 
 
+# Share fixture helpers, not the baseline test methods.
+class TransitionTests(unittest.TestCase):
+    setUp = ControlTests.setUp
+    closed = ControlTests.closed
+    process = ControlTests.process
+
+    def destination(self):
+        original = self.file.read_bytes()
+        self.file.write_text('reviewed synthetic destination\n')
+        target = self.payload.build_manifest()
+        self.file.write_bytes(original)
+        self.assertEqual(self.payload.build_manifest(), self.generation)
+        return target
+
+    def prepare(self):
+        target = self.destination()
+        self.closed()
+        self.controller.prepare_transition(target)
+        return target
+
+    def install_destination(self):
+        self.file.write_text('reviewed synthetic destination\n')
+        return self.payload.build_manifest()
+
+    def test_changed_payload_requires_predeclared_destination(self):
+        target = self.prepare()
+        self.assertEqual(self.gate.status(), {'state': 'UPDATING', 'generation': self.generation, 'target': target})
+        self.assertEqual(self.install_destination(), target)
+        self.assertEqual(self.controller.reconcile_transition(), target)
+        with self.gate.acquire() as lease:
+            self.assertEqual(lease.generation, target)
+
+    def test_active_admission_cannot_start_transition(self):
+        with self.assertRaises(AdmissionError):
+            self.controller.prepare_transition(self.destination())
+        self.assertEqual(self.gate.status()['state'], 'ACTIVE')
+
+    def test_same_or_invalid_target_cannot_start_transition(self):
+        self.closed()
+        for target in (self.generation, '', 'f' * 63, None, ['a' * 64]):
+            with self.subTest(target=target), self.assertRaises(AdmissionError):
+                self.controller.prepare_transition(target)
+        self.assertEqual(self.gate.status()['state'], 'DRAINED')
+
+    def test_pending_transition_cannot_be_overwritten_or_generically_recovered(self):
+        self.prepare()
+        before = self.gate.status()
+        for action in (lambda: self.controller.prepare_transition('a' * 64),
+                       self.controller.recover, lambda: self.controller.close(0),
+                       self.gate.acquire, self.gate.acquire_stop):
+            with self.assertRaises(AdmissionError):
+                action()
+            self.assertEqual(self.gate.status(), before)
+
+    def test_unmodified_original_requires_explicit_restoration(self):
+        self.prepare()
+        with self.assertRaises(AdmissionError):
+            self.controller.reconcile_transition()
+        self.assertEqual(self.gate.status()['state'], 'UPDATING')
+        self.assertEqual(self.controller.reconcile_transition(restore=True), self.generation)
+
+    def test_partial_or_unexpected_payload_cannot_be_adopted(self):
+        self.prepare()
+        before = self.gate.status()
+        self.file.write_text('interrupted synthetic replacement\n')
+        for regenerate in (False, True):
+            if regenerate:
+                self.payload.build_manifest()
+            for restore in (False, True):
+                with self.assertRaises(AdmissionError):
+                    self.controller.reconcile_transition(restore=restore)
+                self.assertEqual(self.gate.status(), before)
+
+    def test_failed_completion_can_retry_after_exact_payload_restoration(self):
+        target = self.prepare()
+        self.file.write_text('partial replacement')
+        with self.assertRaises(AdmissionError):
+            self.controller.reconcile_transition()
+        self.install_destination()
+        self.assertEqual(self.controller.reconcile_transition(), target)
+        with self.assertRaises(AdmissionError):
+            self.controller.reconcile_transition()
+
+    def test_bootstrap_holder_excludes_transition_and_completion(self):
+        target = self.destination()
+        self.closed()
+        fd = os.open(self.gate.directory / 'bootstrap.lock', os.O_RDONLY)
+        try:
+            fcntl.flock(fd, fcntl.LOCK_SH)
+            with self.assertRaises(BlockingIOError):
+                self.controller.prepare_transition(target)
+            fcntl.flock(fd, fcntl.LOCK_UN)
+            self.controller.prepare_transition(target)
+            self.install_destination()
+            fcntl.flock(fd, fcntl.LOCK_SH)
+            with self.assertRaises(BlockingIOError):
+                self.controller.reconcile_transition()
+        finally:
+            os.close(fd)
+        self.assertEqual(self.gate.status()['state'], 'UPDATING')
+
+    def test_agent_registration_excludes_prepare(self):
+        target = self.destination()
+        with self.gate.acquire() as operation:
+            agent = self.gate.acquire_agent(operation)
+        try:
+            self.closed()
+            with self.assertRaises(BlockingIOError):
+                self.controller.prepare_transition(target)
+        finally:
+            agent.close()
+        self.assertEqual(self.gate.status()['state'], 'DRAINED')
+
+    def test_private_process_excludes_prepare_and_completion(self):
+        target = self.destination()
+        self.closed()
+        process = self.process(private=True)
+        with self.assertRaises(AdmissionError):
+            self.controller.prepare_transition(target)
+        (process / 'exe').unlink()
+        (process / 'exe').symlink_to('/synthetic/unrelated')
+        self.controller.prepare_transition(target)
+        self.install_destination()
+        (process / 'exe').unlink()
+        (process / 'exe').symlink_to(self.file)
+        with self.assertRaises(AdmissionError):
+            self.controller.reconcile_transition()
+        self.assertEqual(self.gate.status()['state'], 'UPDATING')
+
+    def test_new_controller_retains_intent_and_stable_lock_inodes(self):
+        before = {p.name: p.stat().st_ino for p in self.gate.directory.glob('*.lock')}
+        target = self.prepare()
+        self.install_destination()
+        fresh = Controller(self.gate, self.payload, ProcessCheck(self.prefix, self.proc))
+        self.assertEqual(fresh.reconcile_transition(), target)
+        self.assertEqual(before, {p.name: p.stat().st_ino for p in self.gate.directory.glob('*.lock')})
+
+    def test_interruption_before_state_replace_preserves_prior_record(self):
+        from unittest.mock import patch
+        target = self.destination()
+        self.closed()
+        with patch('lifecycle_admission.os.replace', side_effect=OSError('synthetic interruption')):
+            with self.assertRaises(OSError):
+                self.controller.prepare_transition(target)
+        self.assertEqual(self.gate.status(), {'state': 'DRAINED', 'generation': self.generation})
+        self.assertEqual(list(self.gate.directory.glob('.state-*')), [])
+
+    def test_interruption_after_state_replace_keeps_closed_intent(self):
+        from unittest.mock import patch
+        target = self.destination()
+        self.closed()
+        original = os.replace
+        def interrupted(*args, **kwargs):
+            original(*args, **kwargs)
+            raise OSError('synthetic interruption after replace')
+        with patch('lifecycle_admission.os.replace', side_effect=interrupted):
+            with self.assertRaises(OSError):
+                self.controller.prepare_transition(target)
+        self.assertEqual(self.gate.status(), {'state': 'UPDATING', 'generation': self.generation, 'target': target})
+        with self.assertRaises(AdmissionError):
+            self.controller.recover()
+
+    def test_killed_preparer_does_not_reopen_admission(self):
+        import signal
+        import select
+        target = self.destination()
+        self.closed()
+        read_fd, write_fd = os.pipe()
+        pid = os.fork()
+        if pid == 0:
+            os.close(read_fd)
+            try:
+                self.controller.prepare_transition(target)
+                os.write(write_fd, b'ready')
+                signal.pause()
+            finally:
+                os._exit(1)
+        os.close(write_fd)
+        try:
+            self.assertTrue(select.select([read_fd], [], [], 5)[0])
+            self.assertEqual(os.read(read_fd, 5), b'ready')
+        finally:
+            os.close(read_fd)
+            os.kill(pid, signal.SIGKILL)
+            os.waitpid(pid, 0)
+        self.assertEqual(self.gate.status()['state'], 'UPDATING')
+        with self.assertRaises(AdmissionError):
+            self.gate.acquire()
+        self.assertEqual(self.controller.reconcile_transition(restore=True), self.generation)
+
+    def test_invalid_transition_record_is_refused(self):
+        import json
+        self.closed()
+        for record in (
+            {'state': 'UPDATING', 'generation': self.generation},
+            {'state': 'UPDATING', 'generation': self.generation, 'target': self.generation},
+            {'state': 'DRAINED', 'generation': self.generation, 'target': 'a' * 64},
+            {'state': 'UPDATING', 'generation': self.generation, 'target': 'invalid'},
+        ):
+            (self.gate.directory / 'state.json').write_text(json.dumps(record))
+            with self.assertRaises(AdmissionError):
+                self.gate.status()
+
+
 if __name__ == '__main__':
     unittest.main()
