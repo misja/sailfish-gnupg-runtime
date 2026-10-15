@@ -127,7 +127,7 @@ class Admission:
             except FileNotFoundError:
                 pass
 
-    def initialize(self, generation):
+    def initialize(self, generation, *, active=True):
         """Explicit privileged setup; partial setup is not automatically repaired."""
         self._generation(generation)
         if os.geteuid() != self.expected_uid:
@@ -135,13 +135,13 @@ class Admission:
         self.directory.mkdir(mode=0o755)
         self.directory.chmod(0o755)
         with self._directory() as directory:
-            for name in ("admission.lock", "operations.lock", "agents.lock"):
+            for name in ("admission.lock", "operations.lock", "agents.lock", "bootstrap.lock"):
                 fd = os.open(name, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW,
                              0o644, dir_fd=directory)
                 os.fchmod(fd, 0o644)
                 os.fsync(fd)
                 os.close(fd)
-            self._write(directory, "ACTIVE", generation)
+            self._write(directory, "ACTIVE" if active else "BLOCKED", generation)
 
     def status(self):
         with self._directory() as directory, self._gate(directory):

@@ -62,9 +62,9 @@ must not be placed in a user-writable directory.
    client exit may leave its verified agent running while ACTIVE.
 
 The current wrapper integration holds operation registration through its guardian
-and tracks a persistent agent separately. Trusted payload-generation validation,
-complete descendant handling and the initial code-load/update boundary remain
-open; registration is not complete maintenance quiescence.
+and tracks a persistent agent separately. Payload-generation validation and the bootstrap lock now cover same-generation
+recovery. Changed-payload transactions, complete descendant handling and migration
+from older wrappers remain open; registration is not complete maintenance quiescence.
 
 ## Interruption and stop
 
@@ -120,10 +120,11 @@ real user home, keyring or password store.
 | Concurrent starts, update drain and new-operation rejection | Wrapper/agent registration and concurrency tests exist; trusted package maintenance/recovery wiring remains open. |
 | In-flight operation, orphan/helper, PID reuse and deadline expiry | Requires implementation plus controlled interruption/identity tests. |
 | Changed executable/library upgrade and remove | Requires approved integration test with process/socket inventory and unrelated sentinels. Same-payload release bump is insufficient. |
-| Failed transaction, interrupted coordinator and recovery | Requires crash/failure injection and proof admission remains closed. |
+| Failed transaction, interrupted coordinator and recovery | Same-generation drain/recovery tested with retained lock inodes and early loader exclusion; package transactions and power-loss recovery remain open. |
 | Stock/user isolation and private data retention | Must be verified independently on the reviewed implementation; host fixtures alone do not establish it. |
 
-[Wrapper integration](lifecycle-wrapper-integration-20261015.md) records current
+[Trusted-state implementation](lifecycle-trusted-state-20261015.md) records the
+current bootstrap/payload/recovery boundary. [Wrapper integration](lifecycle-wrapper-integration-20261015.md) records
 operation/agent admission and remaining integration gaps. The earlier
 [implementation slice](lifecycle-implementation-20261015.md) records IPC supervision
 and the original experimental primitive.

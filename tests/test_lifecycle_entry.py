@@ -15,6 +15,7 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'runtime'))
 from lifecycle_admission import Admission, AdmissionError
+from lifecycle_control import Payload
 
 
 def start_identity(pid):
@@ -44,10 +45,12 @@ class LifecycleEntryTests(unittest.TestCase):
         entry = entry.replace("PREFIX = Path('/usr/libexec/sailfish-gnupg')", f'PREFIX = Path({str(self.prefix)!r})')
         entry = entry.replace("STATE = Path('/var/lib/sailfish-gnupg-runtime')", f'STATE = Path({str(self.state)!r})')
         entry = entry.replace('Admission(STATE)', 'Admission(STATE, expected_uid=os.getuid())')
+        entry = entry.replace('Payload(PREFIX)', 'Payload(PREFIX, entrypoints=(PREFIX.parent / \"sailfish-gpg\", PREFIX.parent / \"sailfish-gpg-agent\"), expected_uid=os.getuid())')
         (self.libexec / 'lifecycle-entry.py').write_text(entry)
         (self.libexec / 'lifecycle_admission.py').write_bytes((ROOT / 'runtime/lifecycle_admission.py').read_bytes())
+        (self.libexec / 'lifecycle_control.py').write_bytes((ROOT / 'runtime/lifecycle_control.py').read_bytes())
         for name in ('sailfish-gpg', 'sailfish-gpg-agent'):
-            text = (ROOT / 'runtime' / name).read_text().replace('/usr/libexec/sailfish-gnupg', str(self.prefix))
+            text = (ROOT / 'runtime' / name).read_text().replace('/usr/libexec/sailfish-gnupg', str(self.prefix)).replace('/var/lib/sailfish-gnupg-runtime', str(self.state))
             (self.root / name).write_text(text)
         self.operation("printf 'completed\\n'")
         self.agent_operation()
@@ -74,7 +77,24 @@ class LifecycleEntryTests(unittest.TestCase):
             f'printf \'{self.report}\\n\' >&"$SAILFISH_LIFECYCLE_REPORT_FD"\n'
             "printf 'managed agent\\n'\n")
 
-    def invoke(self, *arguments, agent=False, **kwargs):
+    def invoke(self, *arguments, agent=False, refresh=True, **kwargs):
+        # Fixture code is deliberately rewritten by individual tests; establish
+        # its manifest and bind the fixture state explicitly before execution.
+        if refresh:
+            self.prefix.chmod(0o755)
+            for path in self.prefix.rglob('*'):
+                path.chmod(0o755 if path.is_dir() else 0o644)
+            for name in ('sailfish-gpg', 'sailfish-gpg-agent'):
+                (self.root / name).chmod(0o644)
+            payload = Payload(self.prefix, entrypoints=(self.root / 'sailfish-gpg', self.root / 'sailfish-gpg-agent'), expected_uid=os.geteuid())
+            generation = payload.build_manifest()
+            try:
+                with self.gate._directory() as directory, self.gate._gate(directory, exclusive=True):
+                    state = self.gate._read(directory)
+                    if state['state'] == 'ACTIVE':
+                        self.gate._write(directory, state['state'], generation)
+            except FileNotFoundError:
+                pass
         command = ['/usr/bin/busybox', 'sh', str(self.root / ('sailfish-gpg-agent' if agent else 'sailfish-gpg'))] + list(arguments)
         process = subprocess.Popen(command, env=self.environment, stdout=subprocess.PIPE,
                                    stderr=subprocess.PIPE, text=True, start_new_session=True, **kwargs)
@@ -185,6 +205,22 @@ class LifecycleEntryTests(unittest.TestCase):
         (self.state / 'state.json').unlink()
         process = self.invoke()
         self.assertEqual(self.finish(process, 78), '')
+
+    def test_bootstrap_lock_is_taken_before_private_python_is_parsed(self):
+        import fcntl
+        fd = os.open(self.state / 'bootstrap.lock', os.O_RDONLY)
+        try:
+            fcntl.flock(fd, fcntl.LOCK_EX)
+            (self.libexec / 'lifecycle-entry.py').write_text('deliberately invalid Python @@@')
+            self.finish(self.invoke(), 75)
+        finally:
+            os.close(fd)
+
+    def test_changed_payload_is_rejected_before_operation_execution(self):
+        self.operation("printf 'passive\\n'", report=False)
+        self.finish(self.invoke('--version'))
+        (self.libexec / 'gpg-operation').write_text("printf 'must not execute\\n'\n")
+        self.assertEqual(self.finish(self.invoke('--version', refresh=False), 78), '')
 
     def test_invalid_agent_action_is_rejected(self):
         self.finish(self.invoke('unknown', agent=True), 64)

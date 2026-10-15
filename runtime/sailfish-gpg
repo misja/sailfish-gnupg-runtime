@@ -3,6 +3,10 @@ set -eu
 PATH=/usr/bin:/bin
 export PATH
 unset BASH_ENV ENV CDPATH LD_LIBRARY_PATH LD_PRELOAD LD_AUDIT GPG_AGENT_INFO
+# Hold a stable lock before reading any private Python code. Missing state
+# fails closed; an exclusive maintenance/recovery owner makes this retryable.
+exec 9< /var/lib/sailfish-gnupg-runtime/bootstrap.lock || exit 78
+/usr/bin/flock --shared --nonblock 9 || exit 75
 # All installed paths are fixed; caller Python configuration is discarded.
 exec /usr/bin/env -i PATH=/usr/bin:/bin \
     SAILFISH_GNUPGHOME="${SAILFISH_GNUPGHOME:-}" \
