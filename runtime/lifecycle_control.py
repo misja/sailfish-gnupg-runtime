@@ -1,4 +1,4 @@
-"""Trusted same-generation bootstrap/recovery; never accepts changed payloads."""
+"""Trusted bootstrap/recovery and experimental generation-transition primitives."""
 import contextlib
 import fcntl
 import hashlib
@@ -220,6 +220,8 @@ class Controller:
                     fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
                 with self.admission._gate(directory, exclusive=True):
                     state = self.admission._read(directory)
+                    if state['state'] == 'UPDATING':
+                        raise AdmissionError('Pending transition requires explicit reconciliation')
                     self.payload.verify(state['generation'])
                     self.admission._write(directory, 'DRAINED', state['generation'])
                 return 'DRAINED'
@@ -230,8 +232,8 @@ class Controller:
     def recover(self):
         with self._closed_locks() as directory:
             state = self.admission._read(directory)
-            if state['state'] == 'ACTIVE':
-                raise AdmissionError('Recovery requires closed admission')
+            if state['state'] in {'ACTIVE', 'UPDATING'}:
+                raise AdmissionError('Recovery requires closed admission without a pending transition')
             try:
                 self.process_check()
                 self.payload.verify(state['generation'])
@@ -240,3 +242,42 @@ class Controller:
                 raise
             self.admission._write(directory, 'ACTIVE', state['generation'])
         return state['generation']
+
+
+    def prepare_transition(self, target):
+        """Persist reviewed destination identity; no payload writes or subprocesses.
+
+        Internal protocol primitive, not an installed administrative action.
+        The future package coordinator must separately supervise every writer
+        and retain bootstrap exclusion through mutation and reconciliation.
+        """
+        self.admission._generation(target)
+        with self._closed_locks() as directory:
+            state = self.admission._read(directory)
+            if state['state'] != 'DRAINED' or target == state['generation']:
+                raise AdmissionError('Transition requires a drained, different generation')
+            self.process_check()
+            self.payload.verify(state['generation'])
+            # One fsynced atomic record: never persist the destination separately
+            # from closed admission and the original recovery generation.
+            self.admission._write(directory, 'UPDATING', state['generation'], target=target)
+        return target
+
+    def reconcile_transition(self, *, restore=False):
+        """Verify only the recorded destination or explicitly restored original.
+
+        Caller must establish that external payload writers have finished. This
+        primitive does not establish writer absence or run a package manager.
+        Failure retains UPDATING and both identities, allowing explicit retry.
+        """
+        if not isinstance(restore, bool):
+            raise AdmissionError('Restoration must be explicit')
+        with self._closed_locks() as directory:
+            state = self.admission._read(directory)
+            if state['state'] != 'UPDATING':
+                raise AdmissionError('No pending transition')
+            generation = state['generation'] if restore else state['target']
+            self.process_check()
+            self.payload.verify(generation)
+            self.admission._write(directory, 'ACTIVE', generation)
+        return generation

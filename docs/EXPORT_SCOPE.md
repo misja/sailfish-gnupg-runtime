@@ -36,5 +36,7 @@ upstream submissions.
 
 Current lifecycle candidate: [trusted-state recovery](lifecycle-trusted-state-20261015.md).
 Release 0.5 requires Python 3 and system flock. Cold bootstrap and same-generation
-recovery exist; changed-payload transitions and device acceptance remain open.
+recovery exist. [Generation-transition state primitives](lifecycle-transition-state-20261015.md)
+record a destination and explicit reconciliation; package-writer supervision,
+changed-payload package integration and device acceptance remain open.
 No device installation is approved by the source changes.
