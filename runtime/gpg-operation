@@ -1,0 +1,56 @@
+#!/usr/bin/busybox sh
+set -eu
+# Fixed BusyBox ash does not import exported Bash functions.
+# The initial loader still belongs to the calling user's trusted process context.
+# Sanitize before utility lookup or starting private helpers; this is not a sandbox.
+PATH=/usr/bin:/bin
+export PATH
+unset BASH_ENV ENV CDPATH LD_LIBRARY_PATH LD_PRELOAD LD_AUDIT GPG_AGENT_INFO
+. /usr/libexec/sailfish-gnupg/libexec/runtime-policy.sh
+policy_home
+managed_autostart=1
+# Prevent this wrapper from silently redirecting its home/helper configuration.
+for argument in "$@"; do
+  case "$argument" in
+    --homedir*|--options*|--agent-program*|--dirmngr-program*|--keyboxd-program*|--exec-path*|--photo-viewer*|--chuid*|--use-keyboxd*|--primary-keyring*|--trustdb-name*|--keyring*|--secret-keyring*)
+      echo 'Home, configuration and helper overrides are not accepted by this wrapper' >&2
+      exit 64 ;;
+  esac
+  case "$argument" in
+    --*) option=${argument%%=*} ;;
+    *) continue ;;
+  esac
+  case --no-autostart in "$option"*) managed_autostart=0 ;; esac
+  # GnuPG accepts abbreviated long options; reject those overrides too.
+  for protected in --homedir --options --agent-program --dirmngr-program --keyboxd-program --exec-path --photo-viewer --chuid --use-keyboxd --primary-keyring --trustdb-name --keyring --secret-keyring; do
+    case "$protected" in
+      "$option"*) echo 'Abbreviated home/configuration/helper overrides are not accepted' >&2; exit 64 ;;
+    esac
+  done
+done
+# Start and report a verified managed agent before handing off the operation.
+# Its lifetime is registered separately from this client's operation lifetime.
+case "$#:${1:-}" in
+    1:--version|1:--help|1:--dump-options) ;;
+    *)
+        if test "$managed_autostart" = 1; then
+            policy_ensure_agent
+            policy_report_agent
+        elif policy_agent_status; then
+            policy_report_agent
+        else
+            agent_state=$?
+            test "$agent_state" = 3 || exit "$agent_state"
+            # The actual GnuPG invocation below cannot spawn an unregistered
+            # replacement agent if no agent is present (or it exits meanwhile).
+            printf 'absent\n' >&"$SAILFISH_LIFECYCLE_REPORT_FD"
+        fi ;;
+esac
+export GNUPGHOME="$SAILFISH_GNUPGHOME"
+unset LD_LIBRARY_PATH LD_PRELOAD
+exec /usr/bin/env -i PATH=/usr/bin:/bin HOME="$SAILFISH_GNUPGHOME" \
+    LANG="${LANG:-C}" LC_ALL="${LC_ALL:-}" TERM="${TERM:-dumb}" \
+    GPG_TTY="${GPG_TTY:-}" XDG_RUNTIME_DIR="/run/user/$current_uid" \
+    GNUPGHOME="$SAILFISH_GNUPGHOME" \
+    /usr/libexec/sailfish-gnupg/bin/gpg --no-options --homedir "$GNUPGHOME" \
+    --agent-program "$private_prefix/bin/gpg-agent|--no-options" --disable-dirmngr --no-autostart "$@"

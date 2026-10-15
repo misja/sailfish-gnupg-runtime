@@ -1,4 +1,4 @@
-"""Experimental admission primitive; not installed or called by the wrappers.
+"""Admission primitives for operation and persistent-agent registration.
 
 The future privileged coordinator owns the directory and state. Tests supply an
 isolated directory/owner explicitly. No environment overrides or default paths.
@@ -21,7 +21,8 @@ class AdmissionError(RuntimeError):
 
 
 class Lease:
-    def __init__(self, fd, generation):
+    def __init__(self, fd, generation, kind="operation"):
+        self.kind = kind
         self.fd = fd
         self.generation = generation
 
@@ -134,7 +135,7 @@ class Admission:
         self.directory.mkdir(mode=0o755)
         self.directory.chmod(0o755)
         with self._directory() as directory:
-            for name in ("admission.lock", "operations.lock"):
+            for name in ("admission.lock", "operations.lock", "agents.lock"):
                 fd = os.open(name, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW,
                              0o644, dir_fd=directory)
                 os.fchmod(fd, 0o644)
@@ -159,6 +160,57 @@ class Admission:
                 os.close(fd)
                 raise
             return Lease(fd, state["generation"])
+
+    def acquire_stop(self):
+        """Stop is allowed after operation drain, but never during active work."""
+        with self._directory() as directory, self._gate(directory):
+            state = self._read(directory)
+            if state["state"] not in {"ACTIVE", "DRAINED"}:
+                raise AdmissionError("Agent stop requires active or drained admission")
+            fd = self._file(directory, "operations.lock")
+            try:
+                fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            except BaseException:
+                os.close(fd)
+                raise
+            return Lease(fd, state["generation"], "stop")
+
+    def acquire_agent(self, operation):
+        """Attach an agent while its admitted operation still owns registration."""
+        if operation.kind != "operation" or operation.fd is None:
+            raise AdmissionError("A live operation registration is required")
+        with self._directory() as directory, self._gate(directory):
+            state = self._read(directory)
+            if (state["state"] not in {"ACTIVE", "DRAINING"}
+                    or state["generation"] != operation.generation):
+                raise AdmissionError("Agent generation does not match its operation")
+            check = self._file(directory, "operations.lock")
+            try:
+                actual, expected = os.fstat(operation.fd), os.fstat(check)
+                if (actual.st_dev, actual.st_ino) != (expected.st_dev, expected.st_ino):
+                    raise AdmissionError("Foreign operation registration")
+            finally:
+                os.close(check)
+            fd = self._file(directory, "agents.lock")
+            try:
+                fcntl.flock(fd, fcntl.LOCK_SH | fcntl.LOCK_NB)
+            except BaseException:
+                os.close(fd)
+                raise
+            return Lease(fd, operation.generation, "agent")
+
+    def agents_registered(self):
+        """Negative result is lease-only, never evidence of process absence."""
+        with self._directory() as directory:
+            fd = self._file(directory, "agents.lock")
+            try:
+                try:
+                    fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                    return False
+                except BlockingIOError:
+                    return True
+            finally:
+                os.close(fd)
 
     def drain(self, timeout):
         """Close admission first; drain leases only. Never reopen automatically."""
