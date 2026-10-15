@@ -1,15 +1,14 @@
 # Current source status
 
-Experimental source snapshot. General release acceptance remains open.
-Repository issues track open work; pull requests record proposed changes and checks.
-See docs/EXPORT_SCOPE.md for build prerequisites and known support limits.
+Experimental source; general release acceptance remains open.
+[Issue #3](https://github.com/misja/sailfish-gnupg-runtime/issues/3) and the project
+board own live work and review status.
 
-Session handoff, 2026-10-15: [issue #3](https://github.com/misja/sailfish-gnupg-runtime/issues/3)
-owns lifecycle work. PR #12 is merged; PR #13 remains draft for human review.
-The [transition-state continuation](docs/lifecycle-transition-state-20261015.md)
-builds on #13 and records original/destination generations atomically, with
-explicit destination or restored-original reconciliation. It adds no CLI action
-or package writer. Package-writer supervision, removal, legacy migration and
-independent verification remain open. Test evidence is linked from that record.
-No real root state, package installation or device change occurred.
-Live issue/PR state is authoritative; this is not a ready device upgrade.
+Cleanup removes the custom Python admission, guardian/watch, generation and
+recovery framework, its tests, manifest build hooks and experimental RPM probes.
+The shell wrappers retain private paths, strict home/agent checks and bounded
+IPC supervision. Candidate 0.6 requires neither Python nor flock at runtime.
+
+See the [maintenance policy](docs/lifecycle-contract.md). Automatic upgrade/removal,
+global start exclusion and independent verification remain unresolved. This is
+not a device-ready upgrade. No installed package, state or user data was changed.

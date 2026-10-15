@@ -185,20 +185,3 @@ OK'} ;;
     esac
     policy_verify_agent
 }
-
-policy_ensure_agent() {
-    if policy_agent_status; then :; else
-        agent_state=$?
-        test "$agent_state" = 3 || return "$agent_state"
-        runtime_timed "$private_prefix/bin/gpg-connect-agent" \
-            --no-history --homedir "$SAILFISH_GNUPGHOME" \
-            --agent-program "$private_prefix/bin/gpg-agent|--no-options" 'GETINFO pid' /bye >/dev/null || return 78
-        policy_agent_status || return 78
-    fi
-}
-
-policy_report_agent() {
-    case ${SAILFISH_LIFECYCLE_REPORT_FD:-} in ''|*[!0-9]*) return 78 ;; esac
-    policy_process_identity "$agent_pid" || return 78
-    printf '%s %s\n' "$agent_pid" "${process_identity#*:}" >&"$SAILFISH_LIFECYCLE_REPORT_FD"
-}

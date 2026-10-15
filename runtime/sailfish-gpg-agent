@@ -3,13 +3,33 @@ set -eu
 PATH=/usr/bin:/bin
 export PATH
 unset BASH_ENV ENV CDPATH LD_LIBRARY_PATH LD_PRELOAD LD_AUDIT GPG_AGENT_INFO
-# Hold a stable lock before reading any private Python code. Missing state
-# fails closed; an exclusive maintenance/recovery owner makes this retryable.
-exec 9< /var/lib/sailfish-gnupg-runtime/bootstrap.lock || exit 78
-/usr/bin/flock --shared --nonblock 9 || exit 75
-# All installed paths are fixed; caller Python configuration is discarded.
-exec /usr/bin/env -i PATH=/usr/bin:/bin \
-    SAILFISH_GNUPGHOME="${SAILFISH_GNUPGHOME:-}" \
-    LANG="${LANG:-C}" LC_ALL="${LC_ALL:-}" TERM="${TERM:-dumb}" \
-    GPG_TTY="${GPG_TTY:-}" \
-    /usr/bin/python3 -I -B /usr/libexec/sailfish-gnupg/libexec/lifecycle-entry.py agent "$@"
+test "$#" = 1 || { echo 'Usage: sailfish-gpg-agent status|start|stop' >&2; exit 64; }
+case "$1" in status|start|stop) action=$1 ;; *) exit 64 ;; esac
+. /usr/libexec/sailfish-gnupg/libexec/runtime-policy.sh
+policy_home
+if policy_agent_status; then agent_state=0; else agent_state=$?; fi
+case "$agent_state" in 0|3) ;; *) exit "$agent_state" ;; esac
+case "$action:$agent_state" in
+    status:3) echo 'Private agent socket absent; process absence not established'; exit 3 ;;
+    status:0|start:0) printf 'Private agent running: %s\n' "$agent_pid" ;;
+    stop:3) echo 'Private agent socket absent; no process shutdown confirmed'; exit 3 ;;
+    start:3)
+        runtime_timed "$private_prefix/bin/gpg-connect-agent" \
+            --no-history --homedir "$SAILFISH_GNUPGHOME" \
+            --agent-program "$private_prefix/bin/gpg-agent|--no-options" 'GETINFO pid' /bye >/dev/null
+        policy_agent_status || { policy_error 'Agent start could not be verified'; exit 78; }
+        printf 'Private agent running: %s\n' "$agent_pid" ;;
+    stop:0)
+        stopped_pid=$agent_pid
+        runtime_timed "$private_prefix/bin/gpg-connect-agent" \
+            --no-history --homedir "$SAILFISH_GNUPGHOME" --raw-socket "$agent_socket" KILLAGENT /bye >/dev/null
+        attempt=0
+        while test "$attempt" -lt 10; do
+            if test ! -e "$proc_root/$stopped_pid" && test ! -e "$agent_socket" && test ! -L "$agent_socket"; then
+                echo 'Private agent stopped; process and socket absent'; exit 0
+            fi
+            /usr/bin/busybox sleep 1
+            attempt=$((attempt + 1))
+        done
+        policy_error 'Agent stop not confirmed; do not upgrade/remove'; exit 78 ;;
+esac

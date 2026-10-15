@@ -1,15 +1,40 @@
 #!/usr/bin/busybox sh
 set -eu
+# Fixed BusyBox ash does not import exported Bash functions.
+# The initial loader still belongs to the calling user's trusted process context.
+# Sanitize before utility lookup or starting private helpers; this is not a sandbox.
 PATH=/usr/bin:/bin
 export PATH
 unset BASH_ENV ENV CDPATH LD_LIBRARY_PATH LD_PRELOAD LD_AUDIT GPG_AGENT_INFO
-# Hold a stable lock before reading any private Python code. Missing state
-# fails closed; an exclusive maintenance/recovery owner makes this retryable.
-exec 9< /var/lib/sailfish-gnupg-runtime/bootstrap.lock || exit 78
-/usr/bin/flock --shared --nonblock 9 || exit 75
-# All installed paths are fixed; caller Python configuration is discarded.
-exec /usr/bin/env -i PATH=/usr/bin:/bin \
-    SAILFISH_GNUPGHOME="${SAILFISH_GNUPGHOME:-}" \
+. /usr/libexec/sailfish-gnupg/libexec/runtime-policy.sh
+policy_home
+# Prevent this wrapper from silently redirecting its home/helper configuration.
+for argument in "$@"; do
+  case "$argument" in
+    --homedir*|--options*|--agent-program*|--dirmngr-program*|--keyboxd-program*|--exec-path*|--photo-viewer*|--chuid*|--use-keyboxd*|--primary-keyring*|--trustdb-name*|--keyring*|--secret-keyring*)
+      echo 'Home, configuration and helper overrides are not accepted by this wrapper' >&2
+      exit 64 ;;
+  esac
+  case "$argument" in
+    --*) option=${argument%%=*} ;;
+    *) continue ;;
+  esac
+  # GnuPG accepts abbreviated long options; reject those overrides too.
+  for protected in --homedir --options --agent-program --dirmngr-program --keyboxd-program --exec-path --photo-viewer --chuid --use-keyboxd --primary-keyring --trustdb-name --keyring --secret-keyring; do
+    case "$protected" in
+      "$option"*) echo 'Abbreviated home/configuration/helper overrides are not accepted' >&2; exit 64 ;;
+    esac
+  done
+done
+if policy_agent_status; then :; else
+    agent_state=$?
+    test "$agent_state" = 3 || exit "$agent_state"
+fi
+export GNUPGHOME="$SAILFISH_GNUPGHOME"
+unset LD_LIBRARY_PATH LD_PRELOAD
+exec /usr/bin/env -i PATH=/usr/bin:/bin HOME="$SAILFISH_GNUPGHOME" \
     LANG="${LANG:-C}" LC_ALL="${LC_ALL:-}" TERM="${TERM:-dumb}" \
-    GPG_TTY="${GPG_TTY:-}" \
-    /usr/bin/python3 -I -B /usr/libexec/sailfish-gnupg/libexec/lifecycle-entry.py gpg "$@"
+    GPG_TTY="${GPG_TTY:-}" XDG_RUNTIME_DIR="/run/user/$current_uid" \
+    GNUPGHOME="$SAILFISH_GNUPGHOME" \
+    /usr/libexec/sailfish-gnupg/bin/gpg --no-options --homedir "$GNUPGHOME" \
+    --agent-program "$private_prefix/bin/gpg-agent|--no-options" --disable-dirmngr "$@"
