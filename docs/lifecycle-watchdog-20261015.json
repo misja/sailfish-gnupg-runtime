@@ -1,0 +1,30 @@
+{
+  "scope": "host-only synthetic IPC lifecycle; no crypto/device acceptance",
+  "source_sha256": "e00a473691ec76f10ecef86249293d195194d586f60d18605933de0bf14bc5e8",
+  "timer_substitution": "15 seconds -> 1 second in temporary copy only",
+  "cases": [
+    {
+      "case": "owner_alive",
+      "owner_exitcode": 137,
+      "ipc_alive_after_observation": false,
+      "wrapper_cleanup_established": true,
+      "observer_cleanup": true
+    },
+    {
+      "case": "owner_TERM",
+      "owner_exitcode": -15,
+      "ipc_alive_after_observation": true,
+      "wrapper_cleanup_established": false,
+      "observer_cleanup": true
+    },
+    {
+      "case": "owner_KILL",
+      "owner_exitcode": -9,
+      "ipc_alive_after_observation": true,
+      "wrapper_cleanup_established": false,
+      "observer_cleanup": true
+    }
+  ],
+  "interrupted_owner_cleanup_proven": false,
+  "observer_sha256": "66c2d491c07b9dc91c14ee69848fb333895ffbf3143b0913df16677e417877af"
+}
