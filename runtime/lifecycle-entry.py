@@ -14,8 +14,10 @@ import subprocess
 import sys
 import time
 
+sys.dont_write_bytecode = True
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from lifecycle_admission import Admission, AdmissionError
+from lifecycle_control import Payload
 
 PREFIX = Path('/usr/libexec/sailfish-gnupg')
 STATE = Path('/var/lib/sailfish-gnupg-runtime')
@@ -46,10 +48,11 @@ def watch(pid, start, uid, interval=0.2):
 
 
 class Runtime:
-    def __init__(self, admission=None, prefix=PREFIX):
+    def __init__(self, admission=None, prefix=PREFIX, payload=None):
         # Explicit injection is for tests, never parsed from argv/environment.
         self.admission = admission if admission is not None else Admission(STATE)
         self.prefix = Path(prefix)
+        self.payload = payload if payload is not None else Payload(PREFIX)
         self.monitors = []
 
     def _monitor(self, registration, pid, start):
@@ -128,6 +131,7 @@ class Runtime:
         stopping = role == 'agent' and arguments == ['stop']
         lease = self.admission.acquire_stop() if stopping else self.admission.acquire()
         with lease:
+            self.payload.verify(lease.generation)
             command = ['/usr/bin/busybox', 'sh', str(self.prefix / 'libexec' / (role + '-operation'))] + arguments
             if stopping:
                 child = lease.spawn(command)

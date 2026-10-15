@@ -5,12 +5,12 @@ Repository issues track open work; pull requests record proposed changes and che
 See docs/EXPORT_SCOPE.md for build prerequisites and known support limits.
 
 Session handoff, 2026-10-15: [issue #3](https://github.com/misja/sailfish-gnupg-runtime/issues/3)
-owns lifecycle work. PRs #10 and #11 are approved and merged. The next
-[wrapper/agent integration](docs/lifecycle-wrapper-integration-20261015.md)
-connects both entry points to mandatory admission and separate persistent-agent
-registration. All 55 host and 50 selected SDK tests passed; the actual RPM install
-fragment staged seven exact files/modes. Candidate 0.4 adds Python 3 as a runtime
-dependency. No full RPM build or installation ran. Trusted root state bootstrap,
-payload-generation authentication, maintenance recovery, changed-payload tests
-and independent verification remain open; this is not a device-ready upgrade.
-Live issue/PR state is authoritative.
+owns lifecycle work. PR #12 is approved and merged. The next
+[trusted-state slice](docs/lifecycle-trusted-state-20261015.md) adds cold bootstrap,
+whole-payload generation checks and explicit same-generation recovery with an
+early loader lock. Candidate 0.5 adds system flock; Python 3 remains required.
+All 77 host and 72 selected SDK tests passed. An inert RPM probe verified manifest
+formation after payload postprocessing; the full GnuPG RPM was not rebuilt.
+No real root state, package installation or device change occurred. Changed-
+payload transactions, legacy migration and independent verification remain open.
+Live issue/PR state is authoritative; this is not a ready device upgrade.
