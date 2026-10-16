@@ -1,0 +1,261 @@
+{
+  "binary_sha256": "332dadb7d8fd4a9202a29f45ec2af98620db1830382d2f48b5b4a040de588c00",
+  "build_command": "SAILFISH_SDK_ROOT=/home/ubuntu/SailfishOS SAILFISH_SDK_TARGET=SailfishOS-5.1.0.11-aarch64 bash tools/sdk-build.sh",
+  "build_log_sha256": "8f07513348e3204b611e6afbfe2e17bc4f093cc003ceaa934d64e7e9ddaede83",
+  "build_target": "SailfishOS-5.1.0.11-aarch64",
+  "builder_checks": {
+    "binary_files_owned_root_root": true,
+    "build_exit_code": 0,
+    "clean_checkout": true,
+    "existing_inspector_passed": true,
+    "no_new_signature_verification_claim": true,
+    "public_signature_verification_material_reused": true,
+    "python_flock_runtime_requirements_absent": true,
+    "removed_lifecycle_payload_absent": true,
+    "seven_locked_archives_reused_and_digest_checked": true
+  },
+  "date": "2026-10-16",
+  "elf_static": [
+    {
+      "needed": [
+        "libz.so.1",
+        "libgcrypt.so.20",
+        "libassuan.so.9",
+        "libnpth.so.0",
+        "libgpg-error.so.0",
+        "libc.so.6",
+        "ld-linux-aarch64.so.1"
+      ],
+      "path": "usr/libexec/sailfish-gnupg/bin/gpg",
+      "runpath": [
+        "/usr/libexec/sailfish-gnupg/lib"
+      ]
+    },
+    {
+      "needed": [
+        "libgcrypt.so.20",
+        "libassuan.so.9",
+        "libnpth.so.0",
+        "libgpg-error.so.0",
+        "libc.so.6",
+        "ld-linux-aarch64.so.1"
+      ],
+      "path": "usr/libexec/sailfish-gnupg/bin/gpg-agent",
+      "runpath": [
+        "/usr/libexec/sailfish-gnupg/lib"
+      ]
+    },
+    {
+      "needed": [
+        "libassuan.so.9",
+        "libgcrypt.so.20",
+        "libgpg-error.so.0",
+        "libc.so.6",
+        "ld-linux-aarch64.so.1"
+      ],
+      "path": "usr/libexec/sailfish-gnupg/bin/gpg-connect-agent",
+      "runpath": [
+        "/usr/libexec/sailfish-gnupg/lib"
+      ]
+    },
+    {
+      "needed": [
+        "libgcrypt.so.20",
+        "libgpg-error.so.0",
+        "libc.so.6",
+        "ld-linux-aarch64.so.1"
+      ],
+      "path": "usr/libexec/sailfish-gnupg/bin/gpgconf",
+      "runpath": [
+        "/usr/libexec/sailfish-gnupg/lib"
+      ]
+    },
+    {
+      "needed": [
+        "libgcrypt.so.20",
+        "libgpg-error.so.0",
+        "libz.so.1",
+        "libc.so.6",
+        "ld-linux-aarch64.so.1"
+      ],
+      "path": "usr/libexec/sailfish-gnupg/bin/gpgsplit",
+      "runpath": [
+        "/usr/libexec/sailfish-gnupg/lib"
+      ]
+    },
+    {
+      "needed": [
+        "libgcrypt.so.20",
+        "libgpg-error.so.0",
+        "libc.so.6",
+        "ld-linux-aarch64.so.1"
+      ],
+      "path": "usr/libexec/sailfish-gnupg/bin/gpgtar",
+      "runpath": [
+        "/usr/libexec/sailfish-gnupg/lib"
+      ]
+    },
+    {
+      "needed": [
+        "libz.so.1",
+        "libgcrypt.so.20",
+        "libassuan.so.9",
+        "libnpth.so.0",
+        "libgpg-error.so.0",
+        "libc.so.6",
+        "ld-linux-aarch64.so.1"
+      ],
+      "path": "usr/libexec/sailfish-gnupg/bin/gpgv",
+      "runpath": [
+        "/usr/libexec/sailfish-gnupg/lib"
+      ]
+    },
+    {
+      "needed": [
+        "libassuan.so.9",
+        "libgpg-error.so.0",
+        "libc.so.6",
+        "ld-linux-aarch64.so.1"
+      ],
+      "path": "usr/libexec/sailfish-gnupg/bin/pinentry-tty",
+      "runpath": [
+        "/usr/libexec/sailfish-gnupg/lib"
+      ]
+    },
+    {
+      "needed": [
+        "libgpg-error.so.0",
+        "libc.so.6",
+        "ld-linux-aarch64.so.1"
+      ],
+      "path": "usr/libexec/sailfish-gnupg/lib/libassuan.so.9.0.2",
+      "runpath": [
+        "/usr/libexec/sailfish-gnupg/lib"
+      ]
+    },
+    {
+      "needed": [
+        "libgpg-error.so.0",
+        "libc.so.6",
+        "ld-linux-aarch64.so.1"
+      ],
+      "path": "usr/libexec/sailfish-gnupg/lib/libgcrypt.so.20.8.9",
+      "runpath": [
+        "/usr/libexec/sailfish-gnupg/lib"
+      ]
+    },
+    {
+      "needed": [
+        "libc.so.6",
+        "ld-linux-aarch64.so.1"
+      ],
+      "path": "usr/libexec/sailfish-gnupg/lib/libgpg-error.so.0.42.1",
+      "runpath": [
+        "/usr/libexec/sailfish-gnupg/lib"
+      ]
+    },
+    {
+      "needed": [
+        "libgpg-error.so.0",
+        "libc.so.6",
+        "ld-linux-aarch64.so.1"
+      ],
+      "path": "usr/libexec/sailfish-gnupg/lib/libksba.so.8.16.1",
+      "runpath": [
+        "/usr/libexec/sailfish-gnupg/lib"
+      ]
+    },
+    {
+      "needed": [
+        "libc.so.6"
+      ],
+      "path": "usr/libexec/sailfish-gnupg/lib/libnpth.so.0.3.0",
+      "runpath": [
+        "/usr/libexec/sailfish-gnupg/lib"
+      ]
+    },
+    {
+      "needed": [
+        "libgcrypt.so.20",
+        "libassuan.so.9",
+        "libgpg-error.so.0",
+        "libc.so.6",
+        "ld-linux-aarch64.so.1"
+      ],
+      "path": "usr/libexec/sailfish-gnupg/libexec/gpg-protect-tool",
+      "runpath": [
+        "/usr/libexec/sailfish-gnupg/lib"
+      ]
+    }
+  ],
+  "identity": "2.5.24-0.6",
+  "inspection_command": "sfdk -c target=SailfishOS-5.1.0.11-aarch64 build-shell python3 tools/inspect-rpm.py --artifact build/rpmbuild/RPMS/aarch64/sailfish-gnupg-private-2.5.24-0.6.aarch64.rpm --source-artifact build/rpmbuild/SRPMS/sailfish-gnupg-private-2.5.24-0.6.src.rpm --output evidence/rpm-inspection-0.6.json",
+  "limits": [
+    "SDK5.1 packaging evidence does not establish Sailfish5.2/device acceptance",
+    "No installation, GnuPG invocation, lifecycle experiment or upstream/dependency update",
+    "Existing23hosttest result retained; unchanged tests not rerun",
+    "Auxiliary debug RPMs generated but not release-validated",
+    "General live upgrade/removal remains open in issue3"
+  ],
+  "provides": [
+    "sailfish-gnupg-private = 2.5.24-0.6",
+    "sailfish-gnupg-private(aarch-64) = 2.5.24-0.6"
+  ],
+  "raw_inspection_sha256": "c44022e6d43c8732f2804877d91d9c43988a42d25474c036c696ad7fdf51597b",
+  "raw_sdk_directory": "/home/ubuntu/runtime-06-20261016",
+  "requires": [
+    "(/bin/stat or /usr/bin/stat)",
+    "/bin/sh",
+    "/usr/bin/busybox",
+    "/usr/bin/busybox",
+    "/usr/bin/env",
+    "/usr/bin/getent",
+    "/usr/bin/id",
+    "ld-linux-aarch64.so.1()(64bit)",
+    "ld-linux-aarch64.so.1(GLIBC_2.17)(64bit)",
+    "libc.so.6()(64bit)",
+    "libc.so.6(GLIBC_2.17)(64bit)",
+    "libc.so.6(GLIBC_2.25)(64bit)",
+    "libc.so.6(GLIBC_2.32)(64bit)",
+    "libc.so.6(GLIBC_2.33)(64bit)",
+    "libc.so.6(GLIBC_2.34)(64bit)",
+    "libc.so.6(GLIBC_2.38)(64bit)",
+    "libz.so.1()(64bit)",
+    "rpmlib(CompressedFileNames) <= 3.0.4-1",
+    "rpmlib(FileDigests) <= 4.6.0-1",
+    "rpmlib(PayloadFilesHavePrefix) <= 4.0-1",
+    "rpmlib(PayloadIsZstd) <= 5.4.18-1",
+    "rpmlib(RichDependencies) <= 4.12.0-1"
+  ],
+  "scope": "Current0.6 binary/source RPM build and static inspection; no installation/runtime/device acceptance",
+  "sdk": "3.13.5",
+  "separate_assistant_review": {
+    "independent_checks": [
+      "Recomputed binary/source RPM, capsule and build-log hashes",
+      "Verified exact clean source checkout",
+      "Direct RPM queries: all208file entries root:root; no Python/flock requirements; no removed lifecycle files; empty scriptlets",
+      "Reviewed existing inspector source and successful result for14ELF and111source inputs"
+    ],
+    "limits": "Not a second full build, human audit, native runtime/lifecycle/device acceptance or release approval",
+    "result": "No blocker for bounded build/packaging evidence",
+    "role": "Tester/packaging reviewer; separate from Builder"
+  },
+  "source_commit": "46e5b60d2281cc6e7bd376924ca0caf5d63354e1",
+  "source_package": {
+    "capsule_sha256": "fc01fbfc5eac73fc095ab75e4a25ec9b8a1c2e07f749eded0da47cd2e698bfcf",
+    "checks": [
+      "matching binary SOURCERPM",
+      "exact spec and capsule bytes",
+      "all source-provenance hashes",
+      "seven upstream archives",
+      "build scripts, wrappers, notices and public verification material"
+    ],
+    "project_provenance": {
+      "git_base_commit": "46e5b60d2281cc6e7bd376924ca0caf5d63354e1",
+      "scope": "Tracked project worktree plus exact locked archives and regenerated public verification material",
+      "tracked_worktree_differs_from_head": false
+    },
+    "sha256": "d97765748b006d0f42dc30dfcc4737df4110493f480d209e15a9cb7165ba1329",
+    "source_file_count": 111
+  }
+}

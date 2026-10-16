@@ -10,3 +10,4 @@
 - [Private-runtime lifecycle contract](lifecycle-contract.md)
 - [Lifecycle baseline and interruption findings](lifecycle-baseline-20261015.md)
 - [Lifecycle implementation and SDK checks](lifecycle-implementation-20261015.md)
+- [Runtime 0.6 SDK build record](build-records/runtime-06-20261016.json)
