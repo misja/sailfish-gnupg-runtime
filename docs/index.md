@@ -1,5 +1,8 @@
 # Documentation
 
+Start with [how this package runs alongside Jolla’s GnuPG](../README.md#alongside-jollas-gnupg)
+and the [package maintenance explanation](../README.md#updating-this-package).
+
 - [Export scope](EXPORT_SCOPE.md)
 - [License scope](../THIRD_PARTY.md)
 - [Original-work license](../LICENSING.md)

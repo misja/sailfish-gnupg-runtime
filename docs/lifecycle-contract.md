@@ -4,6 +4,13 @@ Experimental source; automatic upgrade/removal is unsupported.
 Owner: Misja Hoebe. Tracking: [issue #3](https://github.com/misja/sailfish-gnupg-runtime/issues/3).
 This replaces the proposed custom lifecycle coordinator contract after scope review.
 
+This policy concerns the separate `sailfish-gnupg-private` package and processes
+using its files under `/usr/libexec/sailfish-gnupg`. Jolla’s GnuPG remains
+installed and is outside this maintenance operation. Running clients (including
+pass/OTP operations) and private agents can retain old executables/libraries
+while package files are replaced. That is why process coordination is needed;
+separate package paths do not make live replacement safe automatically.
+
 The shell entry points use an explicit private home, private executables/libraries,
 strict agent identity checks and bounded IPC. They do not implement global
 admission, process ownership across a complete GnuPG operation or package locking.
