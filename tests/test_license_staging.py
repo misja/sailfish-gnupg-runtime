@@ -8,7 +8,7 @@ PROJECT = Path(__file__).resolve().parents[1]
 
 class LicenseStagingTests(unittest.TestCase):
     def test_project_and_component_notices_keep_their_own_directories(self):
-        spec = (PROJECT / "rpm/sailfish-gnupg-private.spec").read_text()
+        spec = (PROJECT / "rpm/sailfish-gnupg-runtime.spec").read_text()
         start = spec.index("mkdir -p %{buildroot}%{private_prefix}/licenses/project")
         end = spec.index("\nfind %{buildroot}", start)
         fragment = spec[start:end]

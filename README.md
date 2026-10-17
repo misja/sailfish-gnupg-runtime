@@ -19,7 +19,7 @@ as a password and OTP store on Sailfish OS.
 
 ## Alongside Jolla’s GnuPG
 
-The `sailfish-gnupg-private` package does not replace Jolla’s GnuPG:
+The `sailfish-gnupg-runtime` package does not replace Jolla’s GnuPG:
 
 | | This package | Jolla’s installation |
 | --- | --- | --- |
@@ -39,15 +39,14 @@ Sailfish Secrets fork. That integration is not part of this CLI package.
 
 ## Updating this package
 
-The maintenance restriction concerns `sailfish-gnupg-private`, not Jolla’s GnuPG.
-Replacing its files while applications or its private agents are running can
-leave them using different versions of the runtime. Automatic coordination of
-those processes during upgrade/removal is not implemented.
+Updating the package does not restart its running private agents. An existing
+agent may continue using the previous version until it exits; fixes in the new
+agent take effect when a new agent starts. This does not affect Jolla’s GnuPG
+or agents.
 
-Before changing this package, ongoing operations must finish, new use must be
-prevented and its private agents must be stopped. Do not stop Jolla’s agents.
-This is not yet a supported general upgrade procedure; see the
-[maintenance notes](docs/lifecycle-contract.md) for the remaining constraints.
+Finish ongoing operations before stopping a private agent. Package removal does
+not automatically coordinate running clients or private agents; see the
+[maintenance notes](docs/lifecycle-contract.md).
 
 ## Source and status
 
@@ -57,9 +56,8 @@ Native pinentry adaptations live in the [Sailfish Secrets fork](https://github.c
 the upstream base and separate compatibility/prototype branches. Prototype
 source files are generated from those commits rather than maintained as copies.
 
-Start with the [documentation index](docs/index.md). Production agent lifecycle,
-exact vendor-source provenance, provider compatibility and upgrade/removal
-behavior remain open. Earlier builds were tested with synthetic data on an
+Start with the [documentation index](docs/index.md). Package removal coordination remains open; native integration has separate
+vendor-source and provider requirements. Earlier builds were tested with synthetic data on an
 Xperia running Sailfish OS 5.2.0.18; package preservation was checked after its
 update to 5.2.0.20. The current revisions have SDK build/regression evidence.
 

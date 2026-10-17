@@ -16,19 +16,20 @@ parser.add_argument('--artifact', type=Path)
 parser.add_argument('--source-artifact', type=Path)
 parser.add_argument('--output', type=Path)
 args = parser.parse_args()
-spec = (root / 'rpm/sailfish-gnupg-private.spec').read_text()
+spec = (root / 'rpm/sailfish-gnupg-runtime.spec').read_text()
 version = re.search(r'^Version: (\S+)$', spec, re.M)[1]
 release = re.search(r'^Release: (\S+)$', spec, re.M)[1]
 identity = f'{version}-{release}'
-artifact = args.artifact or root / f'build/rpmbuild/RPMS/aarch64/sailfish-gnupg-private-{identity}.aarch64.rpm'
-source_artifact = args.source_artifact or root / f'build/rpmbuild/SRPMS/sailfish-gnupg-private-{identity}.src.rpm'
+artifact = args.artifact or root / f'build/rpmbuild/RPMS/aarch64/sailfish-gnupg-runtime-{identity}.aarch64.rpm'
+source_artifact = args.source_artifact or root / f'build/rpmbuild/SRPMS/sailfish-gnupg-runtime-{identity}.src.rpm'
 output = args.output or root / f'evidence/rpm-inspection-{identity}.json'
 if output.exists():
     raise SystemExit(f'Refusing to overwrite inspection evidence: {output}')
 def query(option):
     return subprocess.check_output(['rpm', '-qp', option, str(artifact)], text=True)
-record = {name: query(option) for name, option in [('provides','--provides'), ('requires','--requires'), ('payload','--list'), ('scripts','--scripts')]}
-assert set(record['provides'].splitlines()) == {f'sailfish-gnupg-private = {identity}', f'sailfish-gnupg-private(aarch-64) = {identity}'}
+record = {name: query(option) for name, option in [('provides','--provides'), ('requires','--requires'), ('payload','--list'), ('scripts','--scripts'), ('obsoletes','--obsoletes')]}
+assert set(record['provides'].splitlines()) == {f'sailfish-gnupg-runtime = {identity}', f'sailfish-gnupg-runtime(aarch-64) = {identity}', f'sailfish-gnupg-private = {identity}'}
+assert record['obsoletes'].strip() == 'sailfish-gnupg-private < 2.5.24-0.7'
 assert 'libc.so.6(GLIBC_2.38)(64bit)' in record['requires']
 assert 'libz.so.1()(64bit)' in record['requires']
 assert not re.search(r'^lib(?:gcrypt|gpg-error|assuan|ksba|npth)\.so', record['requires'], re.M)
@@ -97,7 +98,7 @@ record['elf_static'] = elf_records
 source_entries = payload(source_artifact)
 capsule_name = f'sailfish-gnupg-runtime-{version}.tar.gz'
 assert source_entries[capsule_name][1] == (root / 'sources' / capsule_name).read_bytes()
-assert source_entries['sailfish-gnupg-private.spec'][1] == (root / 'rpm/sailfish-gnupg-private.spec').read_bytes()
+assert source_entries['sailfish-gnupg-runtime.spec'][1] == (root / 'rpm/sailfish-gnupg-runtime.spec').read_bytes()
 assert subprocess.check_output(['rpm', '-qp', '--qf', '%{SOURCERPM}', str(artifact)],
                                text=True) == source_artifact.name
 with tarfile.open(fileobj=io.BytesIO(source_entries[capsule_name][1])) as archive:

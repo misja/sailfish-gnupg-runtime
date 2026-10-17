@@ -1,41 +1,43 @@
-# Private runtime maintenance policy
+# Runtime upgrades and removal
 
-Experimental source; automatic upgrade/removal is unsupported.
 Owner: Misja Hoebe. Tracking: [issue #3](https://github.com/misja/sailfish-gnupg-runtime/issues/3).
-This replaces the proposed custom lifecycle coordinator contract after scope review.
+Scope: the separately packaged `sailfish-gnupg-runtime`; Jolla’s GnuPG and agents
+are not part of its lifecycle.
 
-This policy concerns the separate `sailfish-gnupg-private` package and processes
-using its files under `/usr/libexec/sailfish-gnupg`. Jolla’s GnuPG remains
-installed and is outside this maintenance operation. Running clients (including
-pass/OTP operations) and private agents can retain old executables/libraries
-while package files are replaced. That is why process coordination is needed;
-separate package paths do not make live replacement safe automatically.
+## Agent lifetime across updates
 
-The shell entry points use an explicit private home, private executables/libraries,
-strict agent identity checks and bounded IPC. They do not implement global
-admission, process ownership across a complete GnuPG operation or package locking.
-GnuPG can start its configured private agent. A per-home stop does not establish
-that all runtime users and helpers have stopped.
+GnuPG starts private agents on demand. Do not add systemd socket supervision:
+the pinned GnuPG 2.5.24 README discourages it because it conflicts with GnuPG’s
+own activation. The inspected Sailfish SDK systemd 238 user-restart RPM macro
+also performs no action. Familiar service macros alone do not solve this task.
 
-For a separately authorized manual SDK experiment, the operator must prevent all
-users and callers from starting this runtime, finish outstanding work and stop
-positively identified private agents for the known synthetic homes before payload
-replacement/removal. If exclusion or process shutdown cannot be established, do
-not change the installed payload. There is no enforced general upgrade path yet.
+A legitimate private agent may continue after RPM replaces its executable or
+libraries. The wrapper verifies its user, selected home, socket, launch arguments,
+exact private executable path and the private origin of required libraries.
+It permits the kernel's literal `(deleted)` suffix on replaced file mappings;
+it does not require those mappings to equal newly installed filesystem inodes.
+This identifies the private runtime origin, not its precise historical version.
+It is not a security boundary against a compromised process of the same user.
 
-Never stop stock Jolla or unrelated user processes; do not use killall, name-based
-pkill, global gpgconf cleanup, secret-bearing home discovery or home deletion.
-A missing socket does not establish process absence. Preserve all user data.
-Interrupted package changes require inspection/repair before use, not automatic
-reopening or a promise of custom rollback.
+An existing agent keeps its old code until it exits. Installing a security fix
+does not make that fix active in an already running agent. The policy change
+removes an unnecessary rejection after updates; it is not proof of arbitrary
+cross-version compatibility or automatic restart/upgrade coordination.
 
-Release integration must demonstrate start exclusion during replacement/removal
-and safe handling of existing private agents with synthetic fixtures. Old RPM
-%preun alone is too late for an upgrade: the new payload is already installed
-([RPM ordering](https://rpm.org/docs/4.20.x/manual/triggers.html)). SDK-specific
-integration and independent security/release verification remain open.
+## Removal and remaining package integration
 
-The removed Python admission, watcher, generation and recovery framework remains
-available in Git history (PRs #11–#14); it is not a runtime dependency or a future
-implementation requirement. Retained IPC interruption evidence is documented in
-[lifecycle implementation](lifecycle-implementation-20261015.md).
+No lifecycle scriptlets or service framework have been added by this change.
+Automatic coordination of running clients and agents during package removal
+remains unresolved. Normal-user installation/removal must not require finding
+or killing processes manually; do not present a development workaround as the
+finished package behavior.
+
+Never stop stock Jolla or unrelated user processes, delete key homes, or infer
+process absence from a missing socket. User keys and stores must survive removal.
+Changes to package hooks must follow demonstrated upstream/platform practice and
+receive independent review. Do not add a coordinator, registry, marker/locking
+framework or deprecated supervisor merely to preserve a project-specific rule.
+
+Historical lifecycle implementation/probe records retain their original scope;
+they are not acceptance of the current removal behavior. The remaining task is
+tracked in the existing issue, not a new lifecycle specification or backlog.
