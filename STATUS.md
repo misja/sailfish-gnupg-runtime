@@ -23,3 +23,9 @@ No installation, new lifecycle experiment or device acceptance is implied.
 A separate assistant recomputed hashes and checked RPM metadata/ownership and
 reviewed the inspector; no blocker was found for this bounded packaging result.
 This is separate assistant verification, not a human security audit or release approval.
+
+Documentation clarification: README now explains separate package/command/library/
+keyring/agent paths alongside Jolla GnuPG, and scopes maintenance restrictions to
+the private runtime. Native graphical integration is described separately.
+Release Manager wording and independent technical documentation review are tracked
+in workspace release issue #2. No runtime code or package contents changed.

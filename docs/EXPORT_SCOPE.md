@@ -21,13 +21,15 @@ SAILFISH_SDK_TARGET. Follow the ordinary official SDK route, normally Docker
 directly on Linux. The maintainer's outer LXC container is optional. Historical
 test harnesses can still have fixed paths; the clean SDK build and main source/binary RPM inspections are recorded in
 [the build report](https://github.com/misja/sailfish-workspace/blob/main/docs/development/clean-sdk-build-20261015.md).
-The tested bootstrap fixes await review in issue #5. Auxiliary debug-package
+The bootstrap fixes have been merged; see the linked build report. Auxiliary debug-package
 delivery and release acceptance remain separate. Native vendor-source and relink inputs
 are separate gates.
 
-Production agent lifecycle, provider/upgrade behavior and exact Sailfish 5.2
-vendor provenance remain open. Historical 5.2.0.18 results do not establish
-acceptance on 5.2.0.20. Follow repository issues for the remaining work.
+The CLI runtime is a separately named package alongside Jolla’s GnuPG, with
+separate commands, libraries, keyring and agent; see the [overview](../README.md).
+Earlier synthetic Xperia tests and the later OS-update package-preservation
+check remain part of its evidence. Runtime lifecycle and provider/upgrade work
+remain open. Exact vendor-source mapping concerns the separate native integration.
 
 Original work is GPL-3.0-or-later, copyright (c) 2026 Misja Hoebe. See
 [LICENSING](../LICENSING.md) and [upstream exceptions](../THIRD_PARTY.md).
