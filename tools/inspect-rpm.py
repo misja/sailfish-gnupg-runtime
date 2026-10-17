@@ -33,7 +33,12 @@ assert record['obsoletes'].strip() == 'sailfish-gnupg-private < 2.5.24-0.7'
 assert 'libc.so.6(GLIBC_2.38)(64bit)' in record['requires']
 assert 'libz.so.1()(64bit)' in record['requires']
 assert not re.search(r'^lib(?:gcrypt|gpg-error|assuan|ksba|npth)\.so', record['requires'], re.M)
-assert not record['scripts'].strip(), 'Unexpected installation script'
+# Only the reviewed final-removal script is allowed; no startup/upgrade hooks.
+expected_preun = spec.split('%preun\n', 1)[1].split('\n%files', 1)[0].strip()
+expected_preun = expected_preun.replace('%{private_prefix}', '/usr/libexec/sailfish-gnupg')
+assert record['scripts'].splitlines()[0].startswith('preuninstall scriptlet'), record['scripts']
+assert '\n'.join(record['scripts'].splitlines()[1:]).strip() == expected_preun
+
 for binary in ['gpg','gpg-agent','gpgconf','pinentry-tty']:
     assert f'/usr/libexec/sailfish-gnupg/bin/{binary}\n' in record['payload'], binary
 for notice in ['LICENSE', 'LICENSING.md']:

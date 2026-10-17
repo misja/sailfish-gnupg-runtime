@@ -24,19 +24,38 @@ does not make that fix active in an already running agent. The policy change
 removes an unnecessary rejection after updates; it is not proof of arbitrary
 cross-version compatibility or automatic restart/upgrade coordination.
 
-## Removal and remaining package integration
+## Package removal
 
-No lifecycle scriptlets or service framework have been added by this change.
-Automatic coordination of running clients and agents during package removal
-remains unresolved. Normal-user installation/removal must not require finding
-or killing processes manually; do not present a development workaround as the
-finished package behavior.
+Only final removal runs the `%preun` hook (`$1 = 0`). Installation and upgrades
+have no start/stop hooks. GnuPG continues to manage activation itself.
 
-Never stop stock Jolla or unrelated user processes, delete key homes, or infer
-process absence from a missing socket. User keys and stores must survive removal.
-Changes to package hooks must follow demonstrated upstream/platform practice and
-receive independent review. Do not add a coordinator, registry, marker/locking
-framework or deprecated supervisor merely to preserve a project-specific rule.
+The hook first checks public `/proc/PID/exe` identities for supported private
+command-line clients/helpers. If any are found, it refuses removal before
+sending signals and asks the user to close the application and retry. Otherwise
+it sends one TERM request to agents identified by the exact private executable
+path, including a replaced executable marked `(deleted)`. It checks the identity
+again before signalling. No homes, key contents, command arguments or process
+environments are inspected.
+
+The hook does not wait for or force termination, and does not fail after sending
+shutdown requests. This avoids repeatedly signalling a busy agent on automatic
+retry: the pinned GnuPG forcibly exits after its third TERM. Direct Assuan clients
+are outside CLI detection and may be interrupted. This is a shutdown request,
+not a guarantee that every agent exited or that concurrent new starts are
+excluded. No registry, lock, watcher or service framework is introduced.
+
+Normal-user removal does not require finding or killing processes manually.
+Never stop Jolla or unrelated processes or delete key homes/stores. A missing
+socket does not prove process absence. Package hooks use executable identity;
+name-only killall is inappropriate because Jolla also runs gpg-agent, and
+current-file-only selectors miss agents whose old executable was unlinked.
+
+Host fixture tests cover actual signal selection, busy refusal before signals,
+retries, deleted executable matching and stock-process preservation. A bounded
+SDK-emulated GnuPG probe did not demonstrate TERM handling (no handler log or
+exit observed); do not label that a successful native shutdown test. Focused
+confirmation on the actual target remains due before shipping the hook. This
+is not a request to repeat complete Xperia acceptance.
 
 Historical lifecycle implementation/probe records retain their original scope;
 they are not acceptance of the current removal behavior. The remaining task is

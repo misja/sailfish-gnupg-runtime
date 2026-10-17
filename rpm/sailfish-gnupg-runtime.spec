@@ -11,6 +11,7 @@ Provides: sailfish-gnupg-private = %{version}-%{release}
 Obsoletes: sailfish-gnupg-private < 2.5.24-0.7
 Source0: sailfish-gnupg-runtime-%{version}.tar.gz
 BuildRequires: chrpath
+Requires(preun): /usr/bin/busybox
 Requires: /usr/bin/busybox
 Requires: /usr/bin/env
 Requires: /usr/bin/getent
@@ -69,6 +70,33 @@ mkdir -p %{buildroot}/usr/bin
 install -m 0755 runtime/sailfish-gpg %{buildroot}/usr/bin/sailfish-gpg
 install -m 0755 runtime/sailfish-gpg-agent %{buildroot}/usr/bin/sailfish-gpg-agent
 install -m 0644 runtime/runtime-policy.sh %{buildroot}%{private_prefix}/libexec/runtime-policy.sh
+
+%preun
+# Ordinary final removal only. GnuPG handles startup and agent lifetime itself.
+if [ "$1" -eq 0 ]; then
+    private_prefix=%{private_prefix}
+    # Refuse supported active clients before sending any shutdown request.
+    for process in /proc/[0-9]*; do
+        executable=$(/usr/bin/busybox readlink "$process/exe" 2>/dev/null) || continue
+        case "$executable" in
+            "$private_prefix/bin/gpg-agent"|"$private_prefix/bin/gpg-agent (deleted)") ;;
+            "$private_prefix/bin/"*|"$private_prefix/libexec/"*)
+                echo 'GnuPG is in use. Close the application and retry removal.' >&2
+                exit 1 ;;
+        esac
+    done
+    # A single TERM lets GnuPG request shutdown; repeated TERM can force exit.
+    for process in /proc/[0-9]*; do
+        executable=$(/usr/bin/busybox readlink "$process/exe" 2>/dev/null) || continue
+        case "$executable" in
+            "$private_prefix/bin/gpg-agent"|"$private_prefix/bin/gpg-agent (deleted)")
+                test "$(/usr/bin/busybox readlink "$process/exe" 2>/dev/null)" = "$executable" || continue
+                kill -TERM "${process##*/}" 2>/dev/null || \
+                    echo 'Could not request private GnuPG agent shutdown.' >&2 ;;
+        esac
+    done
+fi
+exit 0
 
 %files
 %defattr(-,root,root,-)

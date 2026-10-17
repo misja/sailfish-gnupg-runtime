@@ -44,9 +44,11 @@ agent may continue using the previous version until it exits; fixes in the new
 agent take effect when a new agent starts. This does not affect Jolla’s GnuPG
 or agents.
 
-Finish ongoing operations before stopping a private agent. Package removal does
-not automatically coordinate running clients or private agents; see the
-[maintenance notes](docs/lifecycle-contract.md).
+Removal asks the runtime’s private agents to shut down. If a supported
+command-line operation is detected, removal stops with a message to close the
+application and try again. Jolla’s agents and your stored keys are left alone.
+See the [maintenance notes](docs/lifecycle-contract.md) for the limits of this
+shutdown request.
 
 ## Source and status
 
@@ -56,7 +58,7 @@ Native pinentry adaptations live in the [Sailfish Secrets fork](https://github.c
 the upstream base and separate compatibility/prototype branches. Prototype
 source files are generated from those commits rather than maintained as copies.
 
-Start with the [documentation index](docs/index.md). Package removal coordination remains open; native integration has separate
+Start with the [documentation index](docs/index.md). The removal hook still needs target confirmation; native integration has separate
 vendor-source and provider requirements. Earlier builds were tested with synthetic data on an
 Xperia running Sailfish OS 5.2.0.18; package preservation was checked after its
 update to 5.2.0.20. The current revisions have SDK build/regression evidence.
