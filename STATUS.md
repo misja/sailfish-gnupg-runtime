@@ -46,3 +46,18 @@ solely because their files differ from the new installation. UID/home/socket/
 launch-argument/private-origin checks remain. All 27 synthetic host tests passed.
 No scriptlets, restart guarantee, device acceptance or artifact refresh claimed.
 Research-first instruction copied to all local AGENTS baseline 1.3.0 locations.
+
+Final-removal hook proposed: %preun0 refuses detected private CLI clients before
+signals, otherwise requests one TERM for exact private agent executables (also
+previous deleted files). No install/update hooks, no wait/escalation/state.
+Host fixtures validate control flow and signal selection; SDK-emulated actual
+agent TERM probe was inconclusive and is not target acceptance. Separate source
+review is required; current signed draft assets have not been rebuilt/replaced.
+
+Native confirmation, 2026-10-17: the dev Xperia5.2.0.20 passed busy refusal,
+upgrade skip, idle TERM shutdown and deleted-executable TERM shutdown using only
+synthetic agents/empty homes in an isolated temporary prefix. Jolla hashes and
+process snapshot unchanged; fixture agents/files cleaned. One process scan now
+replaces the redundant two scans. Separate source/evidence review passed.
+See docs/lifecycle-confirmation-20261017.json; actual new0.7RPM transactions and
+full candidate acceptance are not claimed. Existing draft artifacts unchanged.

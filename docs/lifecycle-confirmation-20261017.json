@@ -1,0 +1,39 @@
+{
+  "date": "2026-10-17",
+  "device": "Development Xperia 10 II / Sailfish OS 5.2.0.20 / aarch64",
+  "source_runtime": "Existing installed sailfish-gnupg-private 2.5.24-0.3; GnuPG 2.5.24",
+  "scope": "Exact proposed preun body with temporary private-prefix substitution, native binaries/libraries copied into independent temporary namespace, normal UID100000 synthetic empty homes, hook run as root",
+  "hook_sha256": "9672a90bb3bb08564f1633af2e3e889d6eb2e23d69a2c7e596d36b88bdbc7564",
+  "cases": {
+    "busy_three_retries_no_signals": true,
+    "upgrade_keeps_agent": true,
+    "idle_native_agent_exits": {
+      "state": "gone",
+      "log": "2026-10-17 21:50:19 gpg-agent[21505] gpg-agent (GnuPG) 2.5.24 started\n2026-10-17 21:50:44 gpg-agent[21505] SIGTERM received - shutting down ...\n2026-10-17 21:50:44 gpg-agent[21505] gpg-agent (GnuPG) 2.5.24 stopped\n"
+    },
+    "deleted_native_agent_exits": {
+      "state": "gone",
+      "log": "2026-10-17 21:50:44 gpg-agent[24334] gpg-agent (GnuPG) 2.5.24 started\n2026-10-17 21:50:57 gpg-agent[24334] SIGTERM received - shutting down ...\n2026-10-17 21:50:57 gpg-agent[24334] gpg-agent (GnuPG) 2.5.24 stopped\n"
+    }
+  },
+  "hook_seconds": {
+    "idle": 12.17,
+    "deleted": 12.98
+  },
+  "key_operations": 0,
+  "stock_unchanged": true,
+  "cleanup": {
+    "temporary_directory_absent": true,
+    "known_agents_not_running": true
+  },
+  "stock_unchanged_after_cleanup": true,
+  "limits": [
+    "No actual 0.7 RPM installation/erasure or full candidate acceptance",
+    "No exclusion of concurrent starts or guarantee for arbitrary direct Assuan sessions",
+    "Hook requests graceful shutdown; tested idle cases exited",
+    "Temporary upstream socket relocation configured only for copied fixture binaries; shipped configuration unchanged"
+  ],
+  "separate_review": "Independent assistant matched hook hash, reviewed source and native evidence; not human release authorization",
+  "raw_result_sha256": "60c75d8c28b80177696b38c43507ee81363967219ea61cef9964a3ae5681b97e",
+  "initial_finding": "Original two-pass scan exceeded a 10-second fixture timeout; one-pass selection retained reviewed semantics and passed native cases with bounded 30-second observation."
+}
