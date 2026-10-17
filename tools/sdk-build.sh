@@ -12,12 +12,12 @@ python3 tools/prepare-package.py
 mkdir -p evidence
 if ! test -d .sfdk; then
   "$sdk_root/bin/sfdk" -c "target=$SAILFISH_SDK_TARGET" \
-    -c specfile=rpm/sailfish-gnupg-private.spec build-init
+    -c specfile=rpm/sailfish-gnupg-runtime.spec build-init
 fi
 "$sdk_root/bin/sfdk" -c "target=$SAILFISH_SDK_TARGET" \
-  -c specfile=rpm/sailfish-gnupg-private.spec \
+  -c specfile=rpm/sailfish-gnupg-runtime.spec \
   -c no-pull-build-requires -c no-vcs-apply build-shell rpmbuild -ba \
   --define "_topdir $project_dir/build/rpmbuild" \
   --define "_sourcedir $project_dir/sources" \
-  "$project_dir/rpm/sailfish-gnupg-private.spec" \
+  "$project_dir/rpm/sailfish-gnupg-runtime.spec" \
   2>&1 | tee evidence/latest-build.log

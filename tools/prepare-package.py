@@ -48,7 +48,7 @@ for item in lock["sources"]:
     inputs.update((relative, relative + ".sig"))
 tracked = subprocess.check_output(["git", "-C", str(root), "ls-files", "-z"]).decode().split("\0")
 inputs.update(path for path in tracked if path)
-version = re.search(r"^Version:\s+(\S+)$", source("rpm/sailfish-gnupg-private.spec").read_text(), re.M)[1]
+version = re.search(r"^Version:\s+(\S+)$", source("rpm/sailfish-gnupg-runtime.spec").read_text(), re.M)[1]
 prefix = "sailfish-gnupg-runtime-" + version
 paths = [(relative, source(relative)) for relative in sorted(inputs)]
 provenance = {

@@ -1,12 +1,14 @@
 %global private_prefix /usr/libexec/sailfish-gnupg
 %global __provides_exclude ^lib(assuan|gcrypt|gpg-error|ksba|npth)\\.so.*$
 %global __requires_exclude ^lib(assuan|gcrypt|gpg-error|ksba|npth)\\.so.*$
-Name: sailfish-gnupg-private
+Name: sailfish-gnupg-runtime
 Version: 2.5.24
-Release: 0.6
-Summary: Private GnuPG CLI feasibility runtime (not a release)
+Release: 0.7
+Summary: Modern GnuPG runtime alongside Sailfish OS system GnuPG
 License: GPL-3.0-or-later AND LGPL-2.1-or-later AND LGPL-3.0-or-later
 URL: https://gnupg.org/
+Provides: sailfish-gnupg-private = %{version}-%{release}
+Obsoletes: sailfish-gnupg-private < 2.5.24-0.7
 Source0: sailfish-gnupg-runtime-%{version}.tar.gz
 BuildRequires: chrpath
 Requires: /usr/bin/busybox
@@ -16,8 +18,8 @@ Requires: /usr/bin/id
 Requires: (/bin/stat or /usr/bin/stat)
 
 %description
-Experimental private OpenPGP runtime for synthetic SDK tests. Does not
-replace stock GnuPG or establish Sailfish OS 5.2 device compatibility.
+GnuPG with separate commands, libraries, key directories and agents for
+applications such as pass. Installs alongside Sailfish OS system GnuPG.
 
 %prep
 %setup -q -n sailfish-gnupg-runtime-%{version}

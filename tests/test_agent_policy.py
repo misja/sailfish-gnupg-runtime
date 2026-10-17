@@ -78,10 +78,10 @@ class AgentPolicyTests(unittest.TestCase):
         (self.pid / "exe").symlink_to(executable.with_suffix(".old"))
         self.assertEqual(self.run_policy().returncode, 78)
 
-    def test_deleted_executable_is_rejected(self):
+    def test_replaced_private_executable_is_accepted(self):
         (self.pid / "exe").unlink()
         (self.pid / "exe").symlink_to(str(self.prefix / "bin/gpg-agent") + " (deleted)")
-        self.assertEqual(self.run_policy().returncode, 78)
+        self.assertEqual(self.run_policy().returncode, 0)
 
     def test_unmanaged_launch_options_are_rejected(self):
         self.argv.append("--allow-loopback-pinentry")
@@ -98,15 +98,36 @@ class AgentPolicyTests(unittest.TestCase):
         self.write_maps()
         self.assertEqual(self.run_policy().returncode, 78)
 
-    def test_obsolete_mapping_is_rejected(self):
+    def test_unlinked_private_mapping_is_accepted(self):
         self.mappings[0] = self.mappings[0].rstrip() + " (deleted)\n"
         self.write_maps()
-        self.assertEqual(self.run_policy().returncode, 78)
+        self.assertEqual(self.run_policy().returncode, 0)
 
-    def test_replaced_library_inode_is_rejected(self):
+    def test_replaced_private_library_inode_is_accepted(self):
         library = self.prefix / "lib/libgcrypt.so.20.fixture"
         library.rename(library.with_suffix(".old"))
         library.write_text("changed library payload")
+        self.assertEqual(self.run_policy().returncode, 0)
+
+    def test_previous_private_library_filename_is_accepted(self):
+        self.mappings[0] = self.mappings[0].replace("libgcrypt.so.20.fixture", "libgcrypt.so.20.previous")
+        self.mappings[0] = self.mappings[0].rstrip() + " (deleted)\n"
+        self.write_maps()
+        self.assertEqual(self.run_policy().returncode, 0)
+
+    def test_nested_library_path_is_rejected(self):
+        self.mappings[0] = self.mappings[0].replace("/lib/libgcrypt", "/lib/nested/libgcrypt")
+        self.write_maps()
+        self.assertEqual(self.run_policy().returncode, 78)
+
+    def test_malformed_deleted_mapping_suffix_is_rejected(self):
+        self.mappings[0] = self.mappings[0].rstrip() + " (deleted) extra\n"
+        self.write_maps()
+        self.assertEqual(self.run_policy().returncode, 78)
+
+    def test_malformed_deleted_executable_suffix_is_rejected(self):
+        (self.pid / "exe").unlink()
+        (self.pid / "exe").symlink_to(str(self.prefix / "bin/gpg-agent") + " (deleted) extra")
         self.assertEqual(self.run_policy().returncode, 78)
 
     def test_missing_required_mapping_is_rejected(self):

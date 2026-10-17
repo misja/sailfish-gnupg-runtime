@@ -29,3 +29,20 @@ keyring/agent paths alongside Jolla GnuPG, and scopes maintenance restrictions t
 the private runtime. Native graphical integration is described separately.
 Release Manager wording and independent technical documentation review are tracked
 in workspace release issue #2. No runtime code or package contents changed.
+
+2026-10-17 package correction in progress: rename source to
+sailfish-gnupg-runtime 2.5.24-0.7; coordinated pass/OTP revisions 0.6.
+Current build tools/tests updated; historical evidence/draft artifacts untouched.
+Existing 23 runtime and four pass packaging tests passed. Rename scope reviewed.
+Lifecycle remains unimplemented pending agreement on upstream-aligned agent
+behavior: current inode/generation checks are a project-specific constraint,
+not necessary for namespace coexistence. Pinned GnuPG discourages supervised
+systemd activation; SDK238 user restart macros are ineffective. No custom
+marker/locking/coordinator is authorized as a workaround. See runtime issue #3.
+
+Targeted agent-origin correction: separate scope and source review passed.
+Private agents with replaced executable/library mappings are no longer rejected
+solely because their files differ from the new installation. UID/home/socket/
+launch-argument/private-origin checks remain. All 27 synthetic host tests passed.
+No scriptlets, restart guarantee, device acceptance or artifact refresh claimed.
+Research-first instruction copied to all local AGENTS baseline 1.3.0 locations.

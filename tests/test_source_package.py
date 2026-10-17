@@ -19,7 +19,7 @@ class SourcePackageTests(unittest.TestCase):
         for path in ("tools", "rpm", "runtime", "sources", "evidence"):
             (self.root / path).mkdir()
         shutil.copyfile(PROJECT / "tools/prepare-package.py", self.root / "tools/prepare-package.py")
-        (self.root / "rpm/sailfish-gnupg-private.spec").write_text("Version: 1.0\n")
+        (self.root / "rpm/sailfish-gnupg-runtime.spec").write_text("Version: 1.0\n")
         (self.root / "runtime/wrapper").write_text("#!/bin/sh\nexit 0\n")
         (self.root / "runtime/wrapper").chmod(0o755)
         (self.root / ".gitignore").write_text("/sources/\n/evidence/\n/build/\n")
