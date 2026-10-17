@@ -50,12 +50,16 @@ socket does not prove process absence. Package hooks use executable identity;
 name-only killall is inappropriate because Jolla also runs gpg-agent, and
 current-file-only selectors miss agents whose old executable was unlinked.
 
-Host fixture tests cover actual signal selection, busy refusal before signals,
-retries, deleted executable matching and stock-process preservation. A bounded
-SDK-emulated GnuPG probe did not demonstrate TERM handling (no handler log or
-exit observed); do not label that a successful native shutdown test. Focused
-confirmation on the actual target remains due before shipping the hook. This
-is not a request to repeat complete Xperia acceptance.
+Host fixture tests cover signal selection, busy refusal before signals, retries,
+deleted executable matching and stock-process preservation. A focused check on
+the development Xperia running Sailfish OS 5.2.0.20 used a temporary namespace,
+synthetic empty homes and copies of the installed GnuPG 2.5.24 binaries/libraries.
+The proposed hook was unchanged apart from its temporary path prefix. Idle
+agents, including agents with replaced executables, received TERM and exited;
+three busy-client attempts refused removal without signalling, and the upgrade
+path skipped shutdown. No new runtime RPM was installed. This confirms the tested
+hook behavior, not acceptance of the complete new package revision. The earlier
+SDK-emulated probe was inconclusive. See the [native confirmation record](lifecycle-confirmation-20261017.json).
 
 Historical lifecycle implementation/probe records retain their original scope;
 they are not acceptance of the current removal behavior. The remaining task is

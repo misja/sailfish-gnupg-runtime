@@ -75,23 +75,26 @@ install -m 0644 runtime/runtime-policy.sh %{buildroot}%{private_prefix}/libexec/
 # Ordinary final removal only. GnuPG handles startup and agent lifetime itself.
 if [ "$1" -eq 0 ]; then
     private_prefix=%{private_prefix}
+    agents=
     # Refuse supported active clients before sending any shutdown request.
     for process in /proc/[0-9]*; do
         executable=$(/usr/bin/busybox readlink "$process/exe" 2>/dev/null) || continue
         case "$executable" in
-            "$private_prefix/bin/gpg-agent"|"$private_prefix/bin/gpg-agent (deleted)") ;;
+            "$private_prefix/bin/gpg-agent"|"$private_prefix/bin/gpg-agent (deleted)")
+                pid=${process##*/}
+                case "$pid" in *[!0-9]*) continue ;; esac
+                agents="$agents $pid" ;;
             "$private_prefix/bin/"*|"$private_prefix/libexec/"*)
                 echo 'GnuPG is in use. Close the application and retry removal.' >&2
                 exit 1 ;;
         esac
     done
     # A single TERM lets GnuPG request shutdown; repeated TERM can force exit.
-    for process in /proc/[0-9]*; do
-        executable=$(/usr/bin/busybox readlink "$process/exe" 2>/dev/null) || continue
+    for pid in $agents; do
+        executable=$(/usr/bin/busybox readlink "/proc/$pid/exe" 2>/dev/null) || continue
         case "$executable" in
             "$private_prefix/bin/gpg-agent"|"$private_prefix/bin/gpg-agent (deleted)")
-                test "$(/usr/bin/busybox readlink "$process/exe" 2>/dev/null)" = "$executable" || continue
-                kill -TERM "${process##*/}" 2>/dev/null || \
+                kill -TERM "$pid" 2>/dev/null || \
                     echo 'Could not request private GnuPG agent shutdown.' >&2 ;;
         esac
     done

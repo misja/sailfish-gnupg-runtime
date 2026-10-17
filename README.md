@@ -58,8 +58,9 @@ Native pinentry adaptations live in the [Sailfish Secrets fork](https://github.c
 the upstream base and separate compatibility/prototype branches. Prototype
 source files are generated from those commits rather than maintained as copies.
 
-Start with the [documentation index](docs/index.md). The removal hook still needs target confirmation; native integration has separate
-vendor-source and provider requirements. Earlier builds were tested with synthetic data on an
+Start with the [documentation index](docs/index.md). The removal hook was checked with synthetic agents on the development Xperia
+running Sailfish OS 5.2.0.20. Native integration has separate vendor-source and
+provider requirements. Earlier builds were tested with synthetic data on an
 Xperia running Sailfish OS 5.2.0.18; package preservation was checked after its
 update to 5.2.0.20. The current revisions have SDK build/regression evidence.
 
