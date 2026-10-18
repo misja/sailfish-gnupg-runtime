@@ -27,18 +27,16 @@ are separate gates.
 
 The CLI runtime is a separately named package alongside Jolla’s GnuPG, with
 separate commands, libraries, keyring and agent; see the [overview](../README.md).
-Earlier synthetic Xperia tests and the later OS-update package-preservation
-check remain part of its evidence. Runtime lifecycle and provider/upgrade work
-remain open. Exact vendor-source mapping concerns the separate native integration.
+Existing agents can keep running their previous code after an update. Final
+removal refuses detected private CLI clients or requests private-agent shutdown;
+see the [maintenance notes](lifecycle-contract.md) and bounded native confirmation.
+Native graphical integration has separate source/provider requirements.
 
 Original work is GPL-3.0-or-later, copyright (c) 2026 Misja Hoebe. See
 [LICENSING](../LICENSING.md) and [upstream exceptions](../THIRD_PARTY.md).
 Source publication is separate from package releases, device changes and
 upstream submissions.
 
-Current runtime uses the shell wrappers and bounded IPC supervisor. The custom
-Python admission/watch/generation/recovery layer and payload-manifest RPM hooks
-have been removed. Python remains a build/test tool, not an installed runtime
-requirement. See the [maintenance policy](lifecycle-contract.md): no global
-start exclusion or supported automatic upgrade/removal path is implemented.
-No device installation is approved by these source changes.
+The runtime uses shell launchers and bounded IPC supervision. Python is a
+build/test tool, not an installed runtime requirement. Package maintenance uses
+GnuPG’s on-demand startup and a final-removal RPM hook, without a service framework.

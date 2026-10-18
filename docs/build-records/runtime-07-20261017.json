@@ -1,0 +1,92 @@
+{
+  "date": "2026-10-17",
+  "source_commit": "58dde123489134a67e92306ce46d6c097ce1b8f7",
+  "source_worktree_clean": true,
+  "sdk": "3.13.5 / SailfishOS-5.1.0.11-aarch64",
+  "build": "ordinary tools/sdk-build.sh binary+source RPM; cached locked authenticated archives; no dependency installation",
+  "artifacts": [
+    {
+      "component": "runtime",
+      "filename": "sailfish-gnupg-runtime-2.5.24-0.7.aarch64.rpm",
+      "unsigned_sha256": "af0437be52f2eb529770af033064ab461fa0a1dda339cfbf18f2e09372f5a0be",
+      "signed_sha256": "09d773f6d6ecd56989bcc2d631c9c731e9244c9c568a18d8cb0689f4663c1c74",
+      "main_header_payload_unchanged_by_signing": true
+    },
+    {
+      "component": "runtime",
+      "filename": "sailfish-gnupg-runtime-2.5.24-0.7.src.rpm",
+      "unsigned_sha256": "3f83b90617baf646a5b0c97642506e243f7dd2f8c26610f11a5c1d9ff31f1d2a",
+      "signed_sha256": "0f7d7e9975ca79290095c20f0a34dc1a45ebb33f6806a2c963c5ec0b83126db1",
+      "main_header_payload_unchanged_by_signing": true
+    }
+  ],
+  "provides": [
+    "sailfish-gnupg-private = 2.5.24-0.7",
+    "sailfish-gnupg-runtime = 2.5.24-0.7",
+    "sailfish-gnupg-runtime(aarch-64) = 2.5.24-0.7"
+  ],
+  "obsoletes": [
+    "sailfish-gnupg-private < 2.5.24-0.7"
+  ],
+  "requires": [
+    "(/bin/stat or /usr/bin/stat)",
+    "/bin/sh",
+    "/bin/sh",
+    "/usr/bin/busybox",
+    "/usr/bin/busybox",
+    "/usr/bin/busybox",
+    "/usr/bin/env",
+    "/usr/bin/getent",
+    "/usr/bin/id",
+    "ld-linux-aarch64.so.1()(64bit)",
+    "ld-linux-aarch64.so.1(GLIBC_2.17)(64bit)",
+    "libc.so.6()(64bit)",
+    "libc.so.6(GLIBC_2.17)(64bit)",
+    "libc.so.6(GLIBC_2.25)(64bit)",
+    "libc.so.6(GLIBC_2.32)(64bit)",
+    "libc.so.6(GLIBC_2.33)(64bit)",
+    "libc.so.6(GLIBC_2.34)(64bit)",
+    "libc.so.6(GLIBC_2.38)(64bit)",
+    "libz.so.1()(64bit)",
+    "rpmlib(CompressedFileNames) <= 3.0.4-1",
+    "rpmlib(FileDigests) <= 4.6.0-1",
+    "rpmlib(PayloadFilesHavePrefix) <= 4.0-1",
+    "rpmlib(PayloadIsZstd) <= 5.4.18-1",
+    "rpmlib(RichDependencies) <= 4.12.0-1"
+  ],
+  "source": {
+    "sha256": "3f83b90617baf646a5b0c97642506e243f7dd2f8c26610f11a5c1d9ff31f1d2a",
+    "capsule_sha256": "3194a4bc7b6d520bf9a0b1e9570d164f50d5d77a61a2c093da51910c2d35603d",
+    "source_file_count": 114,
+    "project_provenance": {
+      "git_base_commit": "58dde123489134a67e92306ce46d6c097ce1b8f7",
+      "scope": "Tracked project worktree plus exact locked archives and regenerated public verification material",
+      "tracked_worktree_differs_from_head": false
+    },
+    "checks": [
+      "matching binary SOURCERPM",
+      "exact spec and capsule bytes",
+      "all source-provenance hashes",
+      "seven upstream archives",
+      "build scripts, wrappers, notices and public verification material"
+    ]
+  },
+  "elf_count": 14,
+  "private_runpath": "/usr/libexec/sailfish-gnupg/lib",
+  "scriptlets": "Exact reviewed final-removal preun body; no installation/upgrade hook",
+  "native_hook_evidence": "docs/lifecycle-confirmation-20261017.json",
+  "migration_metadata": {
+    "scope": "SDK RPM database copy and --test/--justdb metadata only; no payload installed or scriptlet executed",
+    "runtime_only_upgrade_rejected": "error: Failed dependencies:\n\tsailfish-gnupg-private = 2.5.24-0.6 is needed by (installed) sailfish-pass-1.7.4-0.5.noarch",
+    "coordinated_runtime_pass_otp_upgrade_exit": 0,
+    "coordinated_upgrade_output": "",
+    "old_name_header_removed": true,
+    "new_headers": [
+      "sailfish-gnupg-runtime 2.5.24-0.7",
+      "sailfish-pass 1.7.4-0.6",
+      "sailfish-pass-otp 1.2.0-0.6"
+    ],
+    "original_sdk_inventory_unchanged": true
+  },
+  "limits": "No new0.7RPM installed/erased on device; native synthetic hook check reused within its recorded scope."
+}

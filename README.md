@@ -35,14 +35,17 @@ The [pass/OTP packages](https://github.com/misja/sailfish-password-store) are
 configured to use this runtime.
 
 Work on Jolla’s graphical password prompt is maintained separately in the
-Sailfish Secrets fork. That integration is not part of this CLI package.
+[Sailfish Secrets compatibility branch](https://github.com/misja/sailfish-secrets/tree/sailfish/native-pinentry-compat).
+That integration is not part of this CLI package.
 
 ## Updating this package
 
-Updating the package does not restart its running private agents. An existing
-agent may continue using the previous version until it exits; fixes in the new
-agent take effect when a new agent starts. This does not affect Jolla’s GnuPG
-or agents.
+If pass/OTP is installed, update the runtime, pass and pass-otp together in the
+same package transaction; the packages have coordinated version dependencies.
+
+Existing private agents continue running across package updates. They use their
+previous code until they exit; a new agent uses the installed fixes. Jolla’s
+GnuPG and agents remain unchanged.
 
 Removal asks the runtime’s private agents to shut down. If a supported
 command-line operation is detected, removal stops with a message to close the
@@ -53,8 +56,7 @@ shutdown request.
 ## Source and status
 
 Runtime launchers, RPM recipes, source locks and build/test tools live here.
-Native pinentry adaptations live in the [Sailfish Secrets fork](https://github.com/misja/sailfish-secrets);
-[the pinned source map](integrations/native-pinentry/sources.json) identifies
+For the graphical password prompt, [the pinned source map](integrations/native-pinentry/sources.json) identifies
 the upstream base and separate compatibility/prototype branches. Prototype
 source files are generated from those commits rather than maintained as copies.
 
