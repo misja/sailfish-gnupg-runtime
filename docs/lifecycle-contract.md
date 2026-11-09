@@ -1,6 +1,6 @@
 # Runtime upgrades and removal
 
-Owner: Misja Hoebe. Tracking: [issue #3](https://github.com/misja/sailfish-gnupg-runtime/issues/3).
+Owner: the maintainer. Tracking: [issue #3](https://github.com/misja/sailfish-gnupg-runtime/issues/3).
 Scope: the separately packaged `sailfish-gnupg-runtime`; Jolla’s GnuPG and agents
 are not part of its lifecycle.
 
