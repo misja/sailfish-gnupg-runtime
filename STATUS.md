@@ -2,7 +2,7 @@
 
 Updated: 2026-10-18. Live work: [runtime #3](https://github.com/misja/sailfish-gnupg-runtime/issues/3)
 and [workspace delivery #2](https://github.com/misja/sailfish-workspace/issues/2).
-Misja decides merge/publication. The Release Manager owns documentation and
+The maintainer decides merge/publication. The Release Manager owns documentation and
 release presentation; an independent reviewer checks technical evidence.
 
 The candidate is `sailfish-gnupg-runtime` 2.5.24-0.7, coordinated with pass
@@ -32,7 +32,7 @@ maintainer review; the [runtime draft](https://github.com/misja/sailfish-gnupg-r
 retains source `58dde123489134a67e92306ce46d6c097ce1b8f7`.
 The delivery evidence and cleanup confirmation remain in the parent workspace's
 `.local-artifacts/release-20261017-cli/`. The Release Manager records the final
-handoff in workspace #2 and runtime #3. Next: Misja's review and later explicit
+handoff in workspace #2 and runtime #3. Next: the maintainer's review and later explicit
 publication decision. Assistant review is not a human audit or release approval.
 No merge, publication, full Xperia retest or new installation/device change.
 Native graphical integration has separate source/provider work.
