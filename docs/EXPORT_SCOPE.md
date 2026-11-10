@@ -32,7 +32,7 @@ removal refuses detected private CLI clients or requests private-agent shutdown;
 see the [maintenance notes](lifecycle-contract.md) and bounded native confirmation.
 Native graphical integration has separate source/provider requirements.
 
-Original work is GPL-3.0-or-later, copyright (c) 2026 Misja Hoebe. See
+Original work is GPL-3.0-or-later. See
 [LICENSING](../LICENSING.md) and [upstream exceptions](../THIRD_PARTY.md).
 Source publication is separate from package releases, device changes and
 upstream submissions.

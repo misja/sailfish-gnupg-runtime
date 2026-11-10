@@ -9,7 +9,7 @@ are not part of its lifecycle.
 GnuPG starts private agents on demand. Do not add systemd socket supervision:
 the pinned GnuPG 2.5.24 README discourages it because it conflicts with GnuPG’s
 own activation. The inspected Sailfish SDK systemd 238 user-restart RPM macro
-also performs no action. Familiar service macros alone do not solve this task.
+also performs no action.
 
 A legitimate private agent may continue after RPM replaces its executable or
 libraries. The wrapper verifies its user, selected home, socket, launch arguments,
@@ -42,7 +42,7 @@ shutdown requests. This avoids repeatedly signalling a busy agent on automatic
 retry: the pinned GnuPG forcibly exits after its third TERM. Direct Assuan clients
 are outside CLI detection and may be interrupted. This is a shutdown request,
 not a guarantee that every agent exited or that concurrent new starts are
-excluded. No registry, lock, watcher or service framework is introduced.
+excluded.
 
 Normal-user removal does not require finding or killing processes manually.
 Never stop Jolla or unrelated processes or delete key homes/stores. A missing
@@ -62,5 +62,5 @@ hook behavior, not acceptance of the complete new package revision. The earlier
 SDK-emulated probe was inconclusive. See the [native confirmation record](lifecycle-confirmation-20261017.json).
 
 Historical lifecycle implementation/probe records retain their original scope;
-they are not acceptance of the current removal behavior. The remaining task is
-tracked in the existing issue, not a new lifecycle specification or backlog.
+they are not acceptance of the current removal behavior. Remaining work:
+[issue #3](https://github.com/misja/sailfish-gnupg-runtime/issues/3).

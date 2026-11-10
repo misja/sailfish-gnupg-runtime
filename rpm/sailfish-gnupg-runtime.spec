@@ -4,7 +4,7 @@
 Name: sailfish-gnupg-runtime
 Version: 2.5.24
 Release: 0.7
-Summary: Modern GnuPG runtime alongside Sailfish OS system GnuPG
+Summary: GnuPG 2.5 alongside the Sailfish OS system GnuPG
 License: GPL-3.0-or-later AND LGPL-2.1-or-later AND LGPL-3.0-or-later
 URL: https://gnupg.org/
 Provides: sailfish-gnupg-private = %{version}-%{release}
